@@ -81,13 +81,28 @@ export default function Home() {
         setImagePreviewUrl(null);
         setImageUploadState("idle");
       }
-    } catch (err) {
-      console.error(err);
-      setStatus("Network or upload error. Please try again.");
-    } finally {
-      setLoading(false);
+      } catch (err: any) {
+    console.error("Submit error:", err);
+
+    let message = "Network or upload error. Please try again.";
+
+    if (err && typeof err === "object") {
+      if ("message" in err && typeof (err as any).message === "string") {
+        message = (err as any).message;
+      } else {
+        try {
+          message = JSON.stringify(err);
+        } catch {
+          // keep default message
+        }
+      }
     }
+
+    setStatus(message);
+  } finally {
+    setLoading(false);
   }
+}
 
   function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0] ?? null;
