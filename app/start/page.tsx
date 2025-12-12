@@ -17,7 +17,14 @@ export default function StartPage() {
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imagePreviewUrl, setImagePreviewUrl] = useState<string | null>(null);
   const [imageUploadState, setImageUploadState] = useState<UploadState>("idle");
-  const fileInputRef = useRef<HTMLInputElement | null>(null);
+  // Cleanup object URL on unmount
+  useEffect(() => {
+    return () => {
+      if (imagePreviewUrl) {
+        URL.revokeObjectURL(imagePreviewUrl);
+      }
+    };
+  }, [imagePreviewUrl]);
 
   async function uploadImageToSupabase(file: File) {
     const ext = file.name.split(".").pop() || "png";
@@ -79,6 +86,11 @@ export default function StartPage() {
   function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
     if (!file) return;
+
+    if (imagePreviewUrl) {
+      URL.revokeObjectURL(imagePreviewUrl);
+    }
+
     setImageFile(file);
     setImageUploadState("idle");
     setImagePreviewUrl(URL.createObjectURL(file));
