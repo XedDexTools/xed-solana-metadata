@@ -229,7 +229,7 @@ export default function StartPage() {
               </div>
 
               <div className="pt-8">
-                <Button type="submit" disabled={loading} className="w-full h-14 bg-white text-black hover:bg-zinc-200 rounded-none font-bold tracking-widest text-sm">
+                <Button type="submit" disabled={loading} className="w-full h-14 bg-green-500 text-black hover:bg-green-400 rounded-none font-bold tracking-widest text-sm transition-colors">
                   {loading ? "PROCESSING..." : "SUBMIT ENTRY"}
                 </Button>
               </div>
