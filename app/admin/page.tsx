@@ -18,7 +18,6 @@ type Submission = {
   status: string | null;
 };
 
-const ADMIN_PASSWORD = process.env.NEXT_PUBLIC_ADMIN_PASSWORD || "";
 
 export default function AdminPage() {
   const [password, setPassword] = useState("");
@@ -61,16 +60,32 @@ export default function AdminPage() {
     setLoading(false);
   }
 
-  function handleLogin(e: React.FormEvent) {
+  async function handleLogin(e: React.FormEvent) {
     e.preventDefault();
+    setError(null);
 
-    if (password === ADMIN_PASSWORD && ADMIN_PASSWORD) {
-      setHasAccess(true);
-      if (typeof window !== "undefined") {
-        window.localStorage.setItem("xed_admin_authed", "true");
+    try {
+      const response = await fetch("/api/admin/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ password }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok && data.success) {
+        setHasAccess(true);
+        if (typeof window !== "undefined") {
+          window.localStorage.setItem("xed_admin_authed", "true");
+        }
+      } else {
+        setError("Incorrect admin password.");
       }
-    } else {
-      setError("Incorrect admin password.");
+    } catch (err) {
+      console.error(err);
+      setError("Login failed. Please try again.");
     }
   }
 
