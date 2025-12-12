@@ -92,8 +92,8 @@ export default function LandingPage() {
         <div className="max-w-[1400px] mx-auto px-6 flex justify-between items-center text-xs font-mono text-zinc-600">
           <div>XED.SCREENER_V1.0</div>
           <div className="flex gap-6">
-            <span className="hover:text-zinc-400 cursor-pointer">TWITTER</span>
-            <span className="hover:text-zinc-400 cursor-pointer">GITHUB</span>
+            <a href="https://x.com/XEDscreener" target="_blank" rel="noopener noreferrer" className="hover:text-zinc-400 cursor-pointer transition-colors">TWITTER</a>
+            <a href="https://github.com/XedDexTools/xed-solana-metadata" target="_blank" rel="noopener noreferrer" className="hover:text-zinc-400 cursor-pointer transition-colors">GITHUB</a>
           </div>
         </div>
       </footer>
