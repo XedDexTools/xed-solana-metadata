@@ -22,7 +22,7 @@ export default function DocsPage() {
         <div className="max-w-[1400px] mx-auto px-6 h-16 flex items-center justify-between">
           <Link href="/" className="flex items-center gap-2 group">
             <div className="w-5 h-5 bg-white group-hover:bg-zinc-300 transition-colors" />
-            <span className="font-bold tracking-tight text-lg">XED REGISTRY</span>
+            <span className="font-bold tracking-tight text-lg">XED SCREENER</span>
           </Link>
           <div className="flex items-center gap-6">
             <span className="font-mono text-xs text-zinc-500">SYSTEM_DOCS_V1.2.4</span>
@@ -79,7 +79,7 @@ export default function DocsPage() {
             </div>
             <h1 className="text-4xl md:text-6xl font-bold tracking-tighter">TECHNICAL SPECIFICATION</h1>
             <p className="text-lg text-zinc-500 max-w-3xl leading-relaxed">
-              Comprehensive documentation for the XED Metadata Registry infrastructure. 
+              Comprehensive documentation for the XED Screener infrastructure. 
               This registry serves as the immutable source of truth for SPL token metadata mapping, 
               providing high-availability access to asset information via decentralized storage endpoints.
             </p>
@@ -316,7 +316,7 @@ export default function DocsPage() {
 
           {/* Footer Note */}
           <div className="border-t border-white/10 pt-12 text-center text-zinc-600 font-mono text-xs">
-            <p>XED_REGISTRY_SYSTEM // END_OF_FILE</p>
+            <p>XED_SCREENER_SYSTEM // END_OF_FILE</p>
             <p className="mt-2">CONFIDENTIALITY_LEVEL: PUBLIC</p>
           </div>
 

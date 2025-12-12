@@ -112,7 +112,7 @@ export default function StartPage() {
         <div className="max-w-[1400px] mx-auto px-6 h-16 flex items-center justify-between">
           <Link href="/" className="flex items-center gap-2 group">
             <div className="w-5 h-5 bg-white group-hover:bg-zinc-300 transition-colors" />
-            <span className="font-bold tracking-tight text-lg">XED REGISTRY</span>
+            <span className="font-bold tracking-tight text-lg">XED SCREENER</span>
           </Link>
           <div className="font-mono text-xs text-zinc-500">
             SECURE_CONNECTION

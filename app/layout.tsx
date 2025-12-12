@@ -2,8 +2,8 @@ import "@/styles/globals.css";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Solana Token Metadata Registry",
-  description: "Submit and manage Solana token metadata on the decentralized registry",
+  title: "XED Screener - Free Solana Token Metadata",
+  description: "FREE Solana token metadata infrastructure. No $300 fees. Permissionless, immutable, standardized.",
 };
 
 export default function RootLayout({

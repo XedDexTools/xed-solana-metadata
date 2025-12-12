@@ -1,4 +1,4 @@
-# 🚀 XED Metadata
+# 🚀 XED Screener
 
 > **FREE Solana token metadata infrastructure. No $300 fees. Permissionless, immutable, standardized.**
 
@@ -11,7 +11,7 @@
 
 ---
 
-## 💰 Why XED Metadata?
+## 💰 Why XED Screener?
 
 ### The Problem
 - **DexScreener charges $300 per metadata update** — an absurd fee for basic infrastructure
@@ -19,7 +19,7 @@
 - Centralized gatekeepers extract value from the Solana ecosystem
 
 ### The Solution
-**XED Metadata is completely FREE.** We handle the $2.56 terminal fee so you don't have to pay $300/update.
+**XED Screener is completely FREE.** We handle the $2.56 terminal fee so you don't have to pay $300/update.
 
 - ✅ **FREE** access (we cover the terminal cost)
 - ✅ **Permissionless** — no gatekeepers, direct on-chain registration

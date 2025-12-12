@@ -1,10 +1,10 @@
-# Contributing to XED Metadata
+# Contributing to XED Screener
 
-Thank you for your interest in contributing to XED Metadata! We're building free, permissionless infrastructure for the Solana ecosystem, and your contributions help make this possible.
+Thank you for your interest in contributing to XED Screener! We're building free, permissionless infrastructure for the Solana ecosystem, and your contributions help make this possible.
 
 ## 🎯 Our Mission
 
-XED Metadata exists to eliminate the $300 paywall that prevents projects from updating their token metadata. We believe infrastructure should be free and accessible to everyone.
+XED Screener exists to eliminate the $300 paywall that prevents projects from updating their token metadata. We believe infrastructure should be free and accessible to everyone.
 
 ## 🤝 How to Contribute
 

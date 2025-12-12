@@ -15,7 +15,7 @@ export default function LandingPage() {
         <div className="max-w-[1400px] mx-auto px-6 h-16 flex items-center justify-between">
           <div className="flex items-center gap-2">
             <div className="w-5 h-5 bg-white" />
-            <span className="font-bold tracking-tight text-lg">XED METADATA</span>
+            <span className="font-bold tracking-tight text-lg">XED SCREENER</span>
           </div>
           <div className="flex items-center gap-8">
             <Link href="/docs" className="text-sm font-medium text-zinc-400 hover:text-white transition-colors">DOCS</Link>
@@ -90,7 +90,7 @@ export default function LandingPage() {
       {/* Footer */}
       <footer className="relative z-10 border-t border-white/10 bg-black py-8">
         <div className="max-w-[1400px] mx-auto px-6 flex justify-between items-center text-xs font-mono text-zinc-600">
-          <div>XED.REGISTRY_V1.0</div>
+          <div>XED.SCREENER_V1.0</div>
           <div className="flex gap-6">
             <span className="hover:text-zinc-400 cursor-pointer">TWITTER</span>
             <span className="hover:text-zinc-400 cursor-pointer">GITHUB</span>
