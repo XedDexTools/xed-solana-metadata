@@ -2,12 +2,12 @@
 
 > **FREE Solana token metadata infrastructure. No $300 fees. Permissionless, immutable, standardized.**
 
-[![Deployed on Vercel](https://img.shields.io/badge/Deployed-Vercel-black?style=flat-square&logo=vercel)](https://xed-solana-metadata.vercel.app)
+[![Deployed on Vercel](https://img.shields.io/badge/Deployed-Vercel-black?style=flat-square&logo=vercel)](https://xedscreener.xyz)
 [![Next.js](https://img.shields.io/badge/Next.js-16.0-black?style=flat-square&logo=next.js)](https://nextjs.org)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.0-blue?style=flat-square&logo=typescript)](https://www.typescriptlang.org)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=flat-square)](LICENSE)
 
-**Live Site:** [xed-solana-metadata.vercel.app](https://xed-solana-metadata.vercel.app)
+**Live Site:** [xedscreener.xyz](https://xedscreener.xyz)
 
 ---
 
@@ -89,7 +89,7 @@ ADMIN_PASSWORD=your_secure_password
 ## 📖 Documentation
 
 Full documentation is available at:
-- **Live Docs:** [xed-solana-metadata.vercel.app/docs](https://xed-solana-metadata.vercel.app/docs)
+- **Live Docs:** [xedscreener.xyz/docs](https://xedscreener.xyz/docs)
 - **API Endpoints:** See `/docs` for complete API reference
 
 ### Key Endpoints
@@ -115,7 +115,7 @@ Full documentation is available at:
 
 ### For Token Creators
 
-1. Visit [xed-solana-metadata.vercel.app/start](https://xed-solana-metadata.vercel.app/start)
+1. Visit [xedscreener.xyz/start](https://xedscreener.xyz/start)
 2. Fill in your token metadata:
    - Wallet Address
    - Mint Address
@@ -129,7 +129,7 @@ Full documentation is available at:
 Use our public API endpoint:
 
 ```bash
-GET https://xed-solana-metadata.vercel.app/api/token?mint=<MINT_ADDRESS>
+GET https://xedscreener.xyz/api/token?mint=<MINT_ADDRESS>
 ```
 
 Returns standardized JSON metadata compatible with trading terminals.
@@ -143,7 +143,7 @@ Returns standardized JSON metadata compatible with trading terminals.
 - Secure API routes with proper error handling
 - Memory leak prevention in file uploads
 
-See [Security Model documentation](https://xed-solana-metadata.vercel.app/docs#security-model) for details.
+See [Security Model documentation](https://xedscreener.xyz/docs#security-model) for details.
 
 ---
 
@@ -169,9 +169,9 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 🌐 Links
 
-- **Live Site:** [xed-solana-metadata.vercel.app](https://xed-solana-metadata.vercel.app)
-- **Documentation:** [xed-solana-metadata.vercel.app/docs](https://xed-solana-metadata.vercel.app/docs)
-- **Admin Panel:** [xed-solana-metadata.vercel.app/admin](https://xed-solana-metadata.vercel.app/admin)
+- **Live Site:** [xedscreener.xyz](https://xedscreener.xyz)
+- **Documentation:** [xedscreener.xyz/docs](https://xedscreener.xyz/docs)
+- **Admin Panel:** [xedscreener.xyz/admin](https://xedscreener.xyz/admin)
 
 ---
 

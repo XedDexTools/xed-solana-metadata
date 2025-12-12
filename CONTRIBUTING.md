@@ -86,7 +86,7 @@ Use clear, descriptive commit messages:
 
 If you have questions, feel free to:
 - Open an [Issue](https://github.com/XedDexTools/xed-solana-metadata/issues)
-- Check the [Documentation](https://xed-solana-metadata.vercel.app/docs)
+- Check the [Documentation](https://xedscreener.xyz/docs)
 
 ## 🙏 Thank You
 
