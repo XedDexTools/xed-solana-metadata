@@ -1,5 +1,5 @@
-import type { NextApiRequest, NextApiResponse } from "next";
-import { supabase } from "../../lib/supabaseClient";
+import { NextRequest, NextResponse } from "next/server";
+import { supabase } from "../../../lib/supabaseClient";
 
 type TokenMetadataResponse = {
   mint: string;
@@ -17,20 +17,16 @@ type ErrorResponse = {
   error: string;
 };
 
-export default async function handler(
-  req: NextApiRequest,
-  res: NextApiResponse<TokenMetadataResponse | ErrorResponse>
-) {
-  // Only allow GET
-  if (req.method !== "GET") {
-    return res.status(405).json({ error: "Method not allowed" });
-  }
-
-  const { mint } = req.query;
+export async function GET(request: NextRequest) {
+  const { searchParams } = new URL(request.url);
+  const mint = searchParams.get("mint");
 
   // Validate mint param
   if (!mint || typeof mint !== "string") {
-    return res.status(400).json({ error: "Missing or invalid ?mint= parameter" });
+    return NextResponse.json(
+      { error: "Missing or invalid ?mint= parameter" },
+      { status: 400 }
+    );
   }
 
   try {
@@ -47,13 +43,14 @@ export default async function handler(
 
     if (error) {
       console.error("Supabase error in /api/token:", error);
-      return res.status(500).json({ error: "Database error" });
+      return NextResponse.json({ error: "Database error" }, { status: 500 });
     }
 
     if (!data || data.length === 0) {
-      return res
-        .status(404)
-        .json({ error: "No approved metadata found for this mint" });
+      return NextResponse.json(
+        { error: "No approved metadata found for this mint" },
+        { status: 404 }
+      );
     }
 
     const row = data[0];
@@ -70,9 +67,12 @@ export default async function handler(
       updatedAt: row.created_at,
     };
 
-    return res.status(200).json(response);
+    return NextResponse.json(response, { status: 200 });
   } catch (err) {
     console.error("Unexpected error in /api/token:", err);
-    return res.status(500).json({ error: "Unexpected server error" });
+    return NextResponse.json(
+      { error: "Unexpected server error" },
+      { status: 500 }
+    );
   }
 }

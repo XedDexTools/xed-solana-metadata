@@ -1,19 +1,13 @@
-import type { NextApiRequest, NextApiResponse } from "next";
-import { supabase } from "../../lib/supabaseClient";
+import { NextRequest, NextResponse } from "next/server";
+import { supabase } from "../../../lib/supabaseClient";
 
 // 3 hour cooldown in milliseconds
 const COOLDOWN_MS = 3 * 60 * 60 * 1000;
 
-export default async function handler(
-  req: NextApiRequest,
-  res: NextApiResponse
-) {
-  // Only allow POST
-  if (req.method !== "POST") {
-    return res.status(405).json({ error: "Method not allowed" });
-  }
-
+export async function POST(request: NextRequest) {
   try {
+    const body = await request.json();
+    
     const {
       wallet,
       mint,
@@ -24,7 +18,7 @@ export default async function handler(
       twitter,
       telegram,
       website,
-    } = req.body || {};
+    } = body || {};
 
     const errors: string[] = [];
 
@@ -97,10 +91,13 @@ export default async function handler(
 
     // If any validation failed, return 400 with details
     if (errors.length > 0) {
-      return res.status(400).json({
-        error: "Validation failed",
-        details: errors,
-      });
+      return NextResponse.json(
+        {
+          error: "Validation failed",
+          details: errors,
+        },
+        { status: 400 }
+      );
     }
 
     // --- 1) Check last submission from this wallet for this mint (cooldown) ---
@@ -114,10 +111,13 @@ export default async function handler(
 
     if (lastCheckError) {
       console.error("Error checking cooldown:", lastCheckError);
-      return res.status(500).json({
-        error: "PGRT2BS",
-        message: "Could not check cooldown. Please try again later.",
-      });
+      return NextResponse.json(
+        {
+          error: "PGRT2BS",
+          message: "Could not check cooldown. Please try again later.",
+        },
+        { status: 500 }
+      );
     }
 
     if (lastRows && lastRows.length > 0 && lastRows[0].created_at) {
@@ -132,10 +132,13 @@ export default async function handler(
           (remainingMs % (60 * 60 * 1000)) / (60 * 1000)
         );
 
-        return res.status(429).json({
-          error: "Too many updates",
-          message: `You can update this token again in about ${remainingHours}h ${remainingMinutes}m.`,
-        });
+        return NextResponse.json(
+          {
+            error: "Too many updates",
+            message: `You can update this token again in about ${remainingHours}h ${remainingMinutes}m.`,
+          },
+          { status: 429 }
+        );
       }
     }
 
@@ -162,16 +165,22 @@ export default async function handler(
 
     if (error) {
       console.error("Error inserting submission:", error);
-      return res.status(500).json({
-        error: "Failed to save submission",
-      });
+      return NextResponse.json(
+        {
+          error: "Failed to save submission",
+        },
+        { status: 500 }
+      );
     }
 
     // --- 3) Success ---
-    return res.status(200).json({
-      success: true,
-      submission: data,
-    });
+    return NextResponse.json(
+      {
+        success: true,
+        submission: data,
+      },
+      { status: 200 }
+    );
   } catch (err: any) {
     console.error("Submit error:", err);
 
@@ -189,6 +198,6 @@ export default async function handler(
       }
     }
 
-    return res.status(500).json({ error: message });
+    return NextResponse.json({ error: message }, { status: 500 });
   }
 }
