@@ -1,5 +1,5 @@
 import { useRef, useState } from "react";
-import { supabase } from "../lib/supabaseClient"; // <- uses your existing client
+import { supabase } from "../lib/supabaseClient";
 
 type UploadState = "idle" | "uploading" | "done";
 
@@ -8,12 +8,13 @@ export default function Home() {
   const [loading, setLoading] = useState(false);
 
   const [imageFile, setImageFile] = useState<File | null>(null);
+  const [imagePreviewUrl, setImagePreviewUrl] = useState<string | null>(null);
   const [imageUploadState, setImageUploadState] =
     useState<UploadState>("idle");
-  const [imagePreviewUrl, setImagePreviewUrl] = useState<string | null>(null);
 
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
+  // ---- Upload helper: put file into Supabase Storage and return public URL ----
   async function uploadImageToSupabase(file: File) {
     const ext = file.name.split(".").pop() || "png";
     const fileName = `${Date.now()}-${Math.random()
@@ -21,7 +22,7 @@ export default function Home() {
       .slice(2)}.${ext}`;
 
     const { data, error } = await supabase.storage
-      .from("token-images") // <- bucket name
+      .from("token-images") // bucket name
       .upload(fileName, file);
 
     if (error) {
@@ -36,13 +37,21 @@ export default function Home() {
     return publicData.publicUrl;
   }
 
-  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+  // ---- Form submit ----
+  async function handleSubmit(
+    e: React.FormEvent<HTMLFormElement>
+  ) {
     e.preventDefault();
+
+    // Save the form element BEFORE any await (fixes the reset() error)
+    const form = e.currentTarget as HTMLFormElement;
+
     setStatus(null);
     setLoading(true);
 
     try {
-      const formData = new FormData(e.currentTarget);
+      // Grab all form fields
+      const formData = new FormData(form);
       const payload: any = Object.fromEntries(formData.entries());
 
       // Handle image: if user uploaded a file, upload it to Supabase
@@ -56,9 +65,10 @@ export default function Home() {
         payload.image = payload.imageUrl;
       }
 
-      delete payload.imageUrl; // not needed by the API
+      // We don’t need imageUrl in the final payload
+      delete payload.imageUrl;
 
-      const res = await fetch("/api/submit", {
+      const response = await fetch("/api/submit", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -66,377 +76,244 @@ export default function Home() {
         body: JSON.stringify(payload),
       });
 
-      const data = await res.json();
+      const json = await response.json().catch(() => null);
 
-      if (!res.ok) {
-        setStatus(
-          data.message ||
-            data.error ||
-            "Something went wrong. Please try again."
-        );
+      if (!response.ok) {
+        console.error("Submit failed:", json);
+
+        let message = "Network or upload error. Please try again.";
+
+        if (json && typeof json === "object") {
+          if (typeof json.message === "string") {
+            message = json.message;
+          } else if (Array.isArray(json.details) && json.details.length) {
+            message = json.details.join(" ");
+          } else if (typeof json.error === "string") {
+            message = json.error;
+          }
+        }
+
+        setStatus(`❌ ${message}`);
       } else {
         setStatus("✅ Submitted successfully!");
-        e.currentTarget.reset();
+
+        // Reset the form using the saved reference (safe)
+        form.reset();
+
+        // Clear image state
         setImageFile(null);
         setImagePreviewUrl(null);
         setImageUploadState("idle");
       }
-      } catch (err: any) {
-    console.error("Submit error:", err);
-
-    let message = "Network or upload error. Please try again.";
-
-    if (err && typeof err === "object") {
-      if ("message" in err && typeof (err as any).message === "string") {
-        message = (err as any).message;
-      } else {
-        try {
-          message = JSON.stringify(err);
-        } catch {
-          // keep default message
-        }
-      }
+    } catch (err) {
+      console.error("Submit error:", err);
+      setStatus("❌ Network or upload error. Please try again.");
+    } finally {
+      setLoading(false);
     }
-
-    setStatus(message);
-  } finally {
-    setLoading(false);
   }
-}
 
-  function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
-    const file = e.target.files?.[0] ?? null;
+  // ---- Image input handlers ----
+  function handleFileChange(
+    e: React.ChangeEvent<HTMLInputElement>
+  ) {
+    const file = e.target.files?.[0];
     if (!file) return;
+
     setImageFile(file);
     setImageUploadState("idle");
 
-    const localUrl = URL.createObjectURL(file);
-    setImagePreviewUrl(localUrl);
-  }
-
-  function handleDrop(e: React.DragEvent<HTMLDivElement>) {
-    e.preventDefault();
-    const file = e.dataTransfer.files?.[0];
-    if (!file) return;
-    setImageFile(file);
-    setImageUploadState("idle");
-
-    const localUrl = URL.createObjectURL(file);
-    setImagePreviewUrl(localUrl);
-  }
-
-  function handleDragOver(e: React.DragEvent<HTMLDivElement>) {
-    e.preventDefault();
+    const url = URL.createObjectURL(file);
+    setImagePreviewUrl(url);
   }
 
   return (
-    <main
-      style={{
-        minHeight: "100vh",
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-        padding: "24px",
-        background: "#050816",
-        color: "white",
-        fontFamily: "system-ui, -apple-system, BlinkMacSystemFont, sans-serif",
-      }}
-    >
-      <div
-        style={{
-          maxWidth: "480px",
-          width: "100%",
-          background: "#111827",
-          borderRadius: "12px",
-          padding: "20px",
-          boxShadow: "0 10px 30px rgba(0,0,0,0.4)",
-        }}
-      >
-        <h1 style={{ fontSize: "20px", marginBottom: "12px" }}>
+    <main className="min-h-screen bg-slate-950 text-slate-50 flex items-center justify-center py-10 px-4">
+      <div className="w-full max-w-xl bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl">
+        <h1 className="text-2xl font-semibold mb-2">
           Solana Token Metadata Submit
         </h1>
-        <p style={{ fontSize: "13px", marginBottom: "16px", color: "#9CA3AF" }}>
+        <p className="text-xs text-slate-400 mb-4">
           Submit your token info. Updates are limited to once every{" "}
-          <strong>3 hours per wallet + mint</strong>.
+          <span className="font-semibold text-slate-200">3 hours</span> per{" "}
+          <span className="font-semibold text-slate-200">
+            wallet + mint
+          </span>
+          .
         </p>
 
-        <form onSubmit={handleSubmit}>
-          <label style={{ fontSize: "13px" }}>
-            Wallet Address *
+        <form onSubmit={handleSubmit} className="space-y-3">
+          {/* Wallet */}
+          <div>
+            <label className="block text-sm mb-1">
+              Wallet Address *
+            </label>
             <input
               name="wallet"
               required
-              style={{
-                width: "100%",
-                marginTop: "4px",
-                marginBottom: "10px",
-                padding: "8px",
-                borderRadius: "8px",
-                border: "1px solid #374151",
-                background: "#020617",
-                color: "white",
-              }}
+              className="w-full rounded-md bg-slate-950 border border-slate-700 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
+              placeholder="Your Solana wallet"
             />
-          </label>
+          </div>
 
-          <label style={{ fontSize: "13px" }}>
-            Mint Address *
+          {/* Mint */}
+          <div>
+            <label className="block text-sm mb-1">
+              Mint Address *
+            </label>
             <input
               name="mint"
               required
-              style={{
-                width: "100%",
-                marginTop: "4px",
-                marginBottom: "10px",
-                padding: "8px",
-                borderRadius: "8px",
-                border: "1px solid #374151",
-                background: "#020617",
-                color: "white",
-              }}
+              className="w-full rounded-md bg-slate-950 border border-slate-700 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
+              placeholder="Token mint address"
             />
-          </label>
+          </div>
 
-          <label style={{ fontSize: "13px" }}>
-            Name
-            <input
-              name="name"
-              style={{
-                width: "100%",
-                marginTop: "4px",
-                marginBottom: "10px",
-                padding: "8px",
-                borderRadius: "8px",
-                border: "1px solid #374151",
-                background: "#020617",
-                color: "white",
-              }}
-            />
-          </label>
-
-          <label style={{ fontSize: "13px" }}>
-            Symbol
-            <input
-              name="symbol"
-              style={{
-                width: "100%",
-                marginTop: "4px",
-                marginBottom: "10px",
-                padding: "8px",
-                borderRadius: "8px",
-                border: "1px solid #374151",
-                background: "#020617",
-                color: "white",
-              }}
-            />
-          </label>
-
-          {/* --------- TOKEN IMAGE UPLOAD (Dexscreener style) --------- */}
-          <div style={{ marginBottom: "12px" }}>
-            <div
-              style={{
-                fontSize: "13px",
-                marginBottom: "4px",
-              }}
-            >
-              Token Image
+          {/* Name & Symbol */}
+          <div className="flex gap-3">
+            <div className="flex-1">
+              <label className="block text-sm mb-1">Name *</label>
+              <input
+                name="name"
+                required
+                className="w-full rounded-md bg-slate-950 border border-slate-700 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                placeholder="Token name"
+              />
             </div>
+            <div className="w-28">
+              <label className="block text-sm mb-1">Symbol *</label>
+              <input
+                name="symbol"
+                required
+                className="w-full rounded-md bg-slate-950 border border-slate-700 px-3 py-2 text-sm uppercase focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                placeholder="TEST"
+              />
+            </div>
+          </div>
 
-            <div
-              onClick={() => fileInputRef.current?.click()}
-              onDrop={handleDrop}
-              onDragOver={handleDragOver}
-              style={{
-                border: "1px dashed #4B5563",
-                borderRadius: "10px",
-                padding: "16px",
-                textAlign: "center",
-                cursor: "pointer",
-                background: "#020617",
-              }}
-            >
-              {imagePreviewUrl ? (
-                <div
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    gap: "10px",
-                    justifyContent: "center",
-                  }}
-                >
-                  <img
-                    src={imagePreviewUrl}
-                    alt="preview"
-                    style={{
-                      width: "40px",
-                      height: "40px",
-                      borderRadius: "999px",
-                      objectFit: "cover",
-                    }}
-                  />
-                  <div style={{ fontSize: "12px", color: "#E5E7EB" }}>
-                    {imageFile?.name}
-                    <div style={{ fontSize: "11px", color: "#9CA3AF" }}>
-                      Click to change or drag a new file
-                    </div>
+          {/* Token Image */}
+          <div>
+            <label className="block text-sm mb-1">Token Image</label>
+            <div className="flex gap-3 items-center">
+              <div className="flex-1">
+                <div className="border border-dashed border-slate-700 rounded-md px-3 py-3 text-xs text-slate-400 bg-slate-950 flex items-center justify-between">
+                  <div>
+                    {imagePreviewUrl ? (
+                      <div className="flex items-center gap-3">
+                        <img
+                          src={imagePreviewUrl}
+                          alt="preview"
+                          className="w-10 h-10 rounded-md object-cover border border-slate-700"
+                        />
+                        <span>Image selected</span>
+                      </div>
+                    ) : (
+                      <span>
+                        Click&nbsp;
+                        <span className="font-semibold text-slate-200">
+                          Choose file
+                        </span>{" "}
+                        or paste an image URL below.
+                      </span>
+                    )}
                   </div>
+                  <button
+                    type="button"
+                    onClick={() => fileInputRef.current?.click()}
+                    className="text-xs px-2 py-1 rounded-md bg-slate-800 hover:bg-slate-700 border border-slate-600"
+                  >
+                    Choose file
+                  </button>
                 </div>
-              ) : (
-                <div style={{ fontSize: "12px", color: "#9CA3AF" }}>
-                  <strong>Click to upload</strong> or drag &amp; drop a token
-                  image here
-                </div>
-              )}
+                <input
+                  type="file"
+                  accept="image/*"
+                  ref={fileInputRef}
+                  className="hidden"
+                  onChange={handleFileChange}
+                />
+                <p className="mt-1 text-[11px] text-slate-500">
+                  Upload an image or paste an image URL below. We’ll
+                  host it for you.
+                </p>
+              </div>
             </div>
 
-            <input
-              ref={fileInputRef}
-              type="file"
-              accept="image/*"
-              style={{ display: "none" }}
-              onChange={handleFileChange}
-            />
-
-            <div
-              style={{
-                marginTop: "6px",
-                fontSize: "11px",
-                color: "#6B7280",
-              }}
-            >
-              Optional: or paste an image URL
-            </div>
+            {/* Optional image URL fallback */}
             <input
               name="imageUrl"
-              placeholder="https://..."
-              style={{
-                width: "100%",
-                marginTop: "4px",
-                padding: "7px",
-                borderRadius: "8px",
-                border: "1px solid #374151",
-                background: "#020617",
-                color: "white",
-                fontSize: "12px",
-              }}
+              placeholder="https://… image URL (optional)"
+              className="mt-2 w-full rounded-md bg-slate-950 border border-slate-700 px-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-emerald-500"
             />
-
-            {imageUploadState === "uploading" && (
-              <div
-                style={{
-                  marginTop: "6px",
-                  fontSize: "11px",
-                  color: "#fbbf24",
-                }}
-              >
-                Uploading image to Supabase...
-              </div>
-            )}
           </div>
-          {/* -------------------------------------------------------- */}
 
-          <label style={{ fontSize: "13px" }}>
-            Description
+          {/* Description */}
+          <div>
+            <label className="block text-sm mb-1">Description *</label>
             <textarea
               name="description"
+              required
               rows={3}
-              style={{
-                width: "100%",
-                marginTop: "4px",
-                marginBottom: "10px",
-                padding: "8px",
-                borderRadius: "8px",
-                border: "1px solid #374151",
-                background: "#020617",
-                color: "white",
-                resize: "vertical",
-              }}
+              className="w-full rounded-md bg-slate-950 border border-slate-700 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 resize-none"
+              placeholder="Short description of the token…"
             />
-          </label>
+          </div>
 
-          <label style={{ fontSize: "13px" }}>
-            Twitter
+          {/* Socials */}
+          <div>
+            <label className="block text-sm mb-1">Twitter</label>
             <input
               name="twitter"
               placeholder="@handle"
-              style={{
-                width: "100%",
-                marginTop: "4px",
-                marginBottom: "10px",
-                padding: "8px",
-                borderRadius: "8px",
-                border: "1px solid #374151",
-                background: "#020617",
-                color: "white",
-              }}
+              className="w-full rounded-md bg-slate-950 border border-slate-700 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
             />
-          </label>
+          </div>
 
-          <label style={{ fontSize: "13px" }}>
-            Telegram
+          <div>
+            <label className="block text-sm mb-1">Telegram</label>
             <input
               name="telegram"
-              placeholder="@username or link"
-              style={{
-                width: "100%",
-                marginTop: "4px",
-                marginBottom: "10px",
-                padding: "8px",
-                borderRadius: "8px",
-                border: "1px solid #374151",
-                background: "#020617",
-                color: "white",
-              }}
+              placeholder="@group"
+              className="w-full rounded-md bg-slate-950 border border-slate-700 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
             />
-          </label>
+          </div>
 
-          <label style={{ fontSize: "13px" }}>
-            Website
+          <div>
+            <label className="block text-sm mb-1">Website</label>
             <input
               name="website"
-              placeholder="https://"
-              style={{
-                width: "100%",
-                marginTop: "4px",
-                marginBottom: "14px",
-                padding: "8px",
-                borderRadius: "8px",
-                border: "1px solid #374151",
-                background: "#020617",
-                color: "white",
-              }}
+              placeholder="https://example.com"
+              className="w-full rounded-md bg-slate-950 border border-slate-700 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
             />
-          </label>
+          </div>
 
+          {/* Submit button */}
           <button
             type="submit"
             disabled={loading}
+            className="w-full mt-3 rounded-md bg-gradient-to-r from-emerald-500 via-sky-500 to-fuchsia-500 py-2 text-sm font-semibold text-slate-900 disabled:opacity-60 disabled:cursor-not-allowed"
+          >
+            {loading
+              ? imageUploadState === "uploading"
+                ? "Uploading image…"
+                : "Submitting…"
+              : "Submit"}
+          </button>
+        </form>
+
+        {/* Status message */}
+        {status && (
+          <p
+            className="mt-3 text-xs"
             style={{
-              width: "100%",
-              padding: "10px",
-              borderRadius: "8px",
-              border: "none",
-              fontWeight: 600,
-              cursor: loading ? "default" : "pointer",
-              background:
-                "linear-gradient(90deg, #22c55e, #3b82f6, #a855f7, #ec4899)",
+              marginTop: "12px",
+              fontSize: "13px",
+              color: status.startsWith("✅") ? "#4ade80" : "#fbbf24",
             }}
           >
-            {loading ? "Submitting..." : "Submit"}
-          </button>
-
-          {status && (
-            <p
-              style={{
-                marginTop: "12px",
-                fontSize: "13px",
-                color: status.startsWith("✅") ? "#4ade80" : "#fbbf24",
-              }}
-            >
-              {status}
-            </p>
-          )}
-        </form>
+            {status}
+          </p>
+        )}
       </div>
     </main>
   );

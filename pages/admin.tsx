@@ -16,13 +16,65 @@ type Submission = {
   status: string | null;
 };
 
+const ADMIN_PASSWORD = process.env.NEXT_PUBLIC_ADMIN_PASSWORD || "";
+
 export default function AdminPage() {
+  const [password, setPassword] = useState("");
+  const [hasAccess, setHasAccess] = useState(false);
   const [submissions, setSubmissions] = useState<Submission[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // helper to update status (approved / rejected)
-  async function updateStatus(id: string, newStatus: string) {
+  // Remember login in localStorage so you don't have to re-type every refresh
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const stored = window.localStorage.getItem("xed_admin_authed");
+    if (stored === "true") {
+      setHasAccess(true);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (hasAccess) {
+      void fetchSubmissions();
+    }
+  }, [hasAccess]);
+
+  async function fetchSubmissions() {
+    setLoading(true);
+    setError(null);
+
+    const { data, error } = await supabase
+      .from("token_submissions")
+      .select("*")
+      .order("created_at", { ascending: false });
+
+    if (error) {
+      console.error("Error loading submissions:", error);
+      setError("Failed to load submissions.");
+    } else {
+      setSubmissions(data as Submission[]);
+    }
+
+    setLoading(false);
+  }
+
+  function handleLogin(e: React.FormEvent) {
+    e.preventDefault();
+
+    if (password === ADMIN_PASSWORD && ADMIN_PASSWORD) {
+      setHasAccess(true);
+      if (typeof window !== "undefined") {
+        window.localStorage.setItem("xed_admin_authed", "true");
+      }
+    } else {
+      setError("Incorrect admin password.");
+    }
+  }
+
+  async function updateStatus(id: string, newStatus: "approved" | "rejected") {
+    setError(null);
+
     const { error } = await supabase
       .from("token_submissions")
       .update({ status: newStatus })
@@ -30,173 +82,334 @@ export default function AdminPage() {
 
     if (error) {
       console.error("Error updating status:", error);
-      alert("Failed to update status: " + error.message);
+      setError("Failed to update status.");
       return;
     }
 
-    // update local state so UI changes immediately
+    // Update local state so UI reflects change immediately
     setSubmissions((prev) =>
-      prev.map((s) => (s.id === id ? { ...s, status: newStatus } : s))
+      prev.map((row) =>
+        row.id === id ? { ...row, status: newStatus } : row
+      )
     );
   }
 
-  useEffect(() => {
-    async function loadSubmissions() {
-      setLoading(true);
-      setError(null);
-
-      const { data, error } = await supabase
-        .from("token_submissions")
-        .select("*")
-        .order("created_at", { ascending: false });
-
-      if (error) {
-        console.error("Error loading submissions:", error);
-        setError(error.message);
-      } else {
-        setSubmissions((data || []) as Submission[]);
-      }
-
-      setLoading(false);
-    }
-
-    loadSubmissions();
-  }, []);
-
-  return (
-    <main className="min-h-screen bg-[#020617] text-white px-6 py-10">
-      <div className="max-w-6xl mx-auto">
-        <h1 className="text-3xl font-semibold mb-2">Token Submissions</h1>
-        <p className="text-sm text-gray-400 mb-6">
-          Internal admin view of all submitted tokens.
-        </p>
-
-        {loading && <p>Loading submissions…</p>}
-        {error && (
-          <p className="text-red-400 mb-4">
-            Error loading submissions: {error}
+  if (!hasAccess) {
+    // Simple password gate
+    return (
+      <main
+        style={{
+          minHeight: "100vh",
+          background: "#000",
+          color: "#fff",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          padding: "24px",
+        }}
+      >
+        <div
+          style={{
+            width: "100%",
+            maxWidth: "400px",
+            background: "#111827",
+            borderRadius: "12px",
+            padding: "24px",
+            boxShadow: "0 0 0 1px rgba(255,255,255,0.05)",
+          }}
+        >
+          <h1 style={{ fontSize: "20px", marginBottom: "12px" }}>
+            Admin Login
+          </h1>
+          <p style={{ fontSize: "14px", marginBottom: "16px", color: "#9CA3AF" }}>
+            Enter the admin password to view token submissions.
           </p>
-        )}
 
-        {!loading && !error && submissions.length === 0 && (
-          <p className="text-gray-400">No submissions yet.</p>
-        )}
+          <form onSubmit={handleLogin}>
+            <input
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="Admin password"
+              style={{
+                width: "100%",
+                padding: "8px 10px",
+                borderRadius: "8px",
+                border: "1px solid #4B5563",
+                background: "#030712",
+                color: "#F9FAFB",
+                marginBottom: "12px",
+              }}
+            />
+            <button
+              type="submit"
+              style={{
+                width: "100%",
+                padding: "8px 10px",
+                borderRadius: "9999px",
+                border: "none",
+                background:
+                  "linear-gradient(to right, #10B981, #3B82F6, #A855F7)",
+                color: "#fff",
+                fontWeight: 600,
+                cursor: "pointer",
+              }}
+            >
+              Enter
+            </button>
+          </form>
 
-        {!loading && submissions.length > 0 && (
-          <div className="overflow-x-auto rounded-lg border border-gray-800">
-            <table className="min-w-full text-sm">
-              <thead className="bg-gray-900">
-                <tr>
-                  <th className="px-3 py-2 text-left">Created</th>
-                  <th className="px-3 py-2 text-left">Wallet</th>
-                  <th className="px-3 py-2 text-left">Mint</th>
-                  <th className="px-3 py-2 text-left">Name</th>
-                  <th className="px-3 py-2 text-left">Symbol</th>
-                  <th className="px-3 py-2 text-left">Status</th>
-                  <th className="px-3 py-2 text-left">Image</th>
-                  <th className="px-3 py-2 text-left">Links</th>
-                  <th className="px-3 py-2 text-left">Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {submissions.map((s) => (
-                  <tr
-                    key={s.id}
-                    className="border-t border-gray-800 hover:bg-gray-900/60"
-                  >
-                    <td className="px-3 py-2 whitespace-nowrap text-gray-400">
-                      {s.created_at
-                        ? new Date(s.created_at).toLocaleString()
-                        : "-"}
-                    </td>
-                    <td className="px-3 py-2 max-w-[160px] truncate">
-                      {s.wallet || "-"}
-                    </td>
-                    <td className="px-3 py-2 max-w-[220px] truncate">
-                      {s.mint || "-"}
-                    </td>
-                    <td className="px-3 py-2">{s.name || "-"}</td>
-                    <td className="px-3 py-2">{s.symbol || "-"}</td>
-                    <td className="px-3 py-2">
-                      <span className="inline-flex rounded-full px-2 py-0.5 text-xs bg-gray-800">
-                        {s.status || "pending"}
-                      </span>
-                    </td>
-                    <td className="px-3 py-2">
-                      {s.image ? (
-                        <a
-                          href={s.image}
-                          target="_blank"
-                          rel="noreferrer"
-                          className="text-sky-400 underline"
-                        >
-                          open
-                        </a>
-                      ) : (
-                        "-"
-                      )}
-                    </td>
-                    <td className="px-3 py-2 text-xs">
-                      {s.twitter && (
-                        <div>
-                          <span className="text-gray-400">X:</span>{" "}
+          {error && (
+            <p
+              style={{
+                marginTop: "12px",
+                fontSize: "13px",
+                color: "#F97316",
+              }}
+            >
+              {error}
+            </p>
+          )}
+        </div>
+      </main>
+    );
+  }
+
+  // Admin view
+  return (
+    <main
+      style={{
+        minHeight: "100vh",
+        background: "#000",
+        color: "#fff",
+        padding: "24px",
+        fontFamily: "system-ui, -apple-system, BlinkMacSystemFont, sans-serif",
+      }}
+    >
+      <h1 style={{ fontSize: "24px", marginBottom: "4px" }}>
+        Token Submissions
+      </h1>
+      <p
+        style={{
+          fontSize: "13px",
+          color: "#9CA3AF",
+          marginBottom: "16px",
+        }}
+      >
+        Internal admin view of all submitted tokens.
+      </p>
+
+      {error && (
+        <p style={{ color: "#F97316", marginBottom: "12px", fontSize: "13px" }}>
+          {error}
+        </p>
+      )}
+
+      {loading ? (
+        <p>Loading submissions…</p>
+      ) : submissions.length === 0 ? (
+        <p>No submissions yet.</p>
+      ) : (
+        <div
+          style={{
+            width: "100%",
+            overflowX: "auto",
+            borderRadius: "12px",
+            border: "1px solid #1F2937",
+            background: "#020617",
+          }}
+        >
+          <table
+            style={{
+              width: "100%",
+              borderCollapse: "collapse",
+              fontSize: "13px",
+            }}
+          >
+            <thead>
+              <tr
+                style={{
+                  background: "#111827",
+                  textAlign: "left",
+                }}
+              >
+                <th style={thStyle}>Created</th>
+                <th style={thStyle}>Wallet</th>
+                <th style={thStyle}>Mint</th>
+                <th style={thStyle}>Name</th>
+                <th style={thStyle}>Symbol</th>
+                <th style={thStyle}>Status</th>
+                <th style={thStyle}>Image</th>
+                <th style={thStyle}>Links</th>
+                <th style={thStyle}>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {submissions.map((row) => (
+                <tr
+                  key={row.id}
+                  style={{
+                    borderTop: "1px solid #111827",
+                  }}
+                >
+                  <td style={tdStyle}>
+                    {row.created_at
+                      ? new Date(row.created_at).toLocaleString()
+                      : "—"}
+                  </td>
+                  <td style={tdStyle}>{row.wallet || "—"}</td>
+                  <td style={tdStyle}>{row.mint || "—"}</td>
+                  <td style={tdStyle}>{row.name || "—"}</td>
+                  <td style={tdStyle}>{row.symbol || "—"}</td>
+                  <td style={tdStyle}>
+                    <span
+                      style={{
+                        padding: "2px 8px",
+                        borderRadius: "9999px",
+                        fontSize: "11px",
+                        textTransform: "uppercase",
+                        letterSpacing: "0.04em",
+                        background:
+                          row.status === "approved"
+                            ? "rgba(16,185,129,0.15)"
+                            : row.status === "rejected"
+                            ? "rgba(239,68,68,0.15)"
+                            : "rgba(107,114,128,0.15)",
+                        color:
+                          row.status === "approved"
+                            ? "#6EE7B7"
+                            : row.status === "rejected"
+                            ? "#FCA5A5"
+                            : "#E5E7EB",
+                      }}
+                    >
+                      {row.status || "pending"}
+                    </span>
+                  </td>
+                  <td style={tdStyle}>
+                    {row.image ? (
+                      <a
+                        href={row.image}
+                        target="_blank"
+                        rel="noreferrer"
+                        style={{ color: "#60A5FA" }}
+                      >
+                        open
+                      </a>
+                    ) : (
+                      "—"
+                    )}
+                  </td>
+                  <td style={tdStyle}>
+                    <div style={{ display: "flex", flexDirection: "column" }}>
+                      {row.twitter && (
+                        <span>
+                          X:{" "}
                           <a
                             href={
-                              s.twitter.startsWith("http")
-                                ? s.twitter
-                                : `https://x.com/${s.twitter.replace("@", "")}`
+                              row.twitter.startsWith("http")
+                                ? row.twitter
+                                : `https://x.com/${row.twitter.replace("@", "")}`
                             }
                             target="_blank"
                             rel="noreferrer"
-                            className="text-sky-400 underline"
+                            style={{ color: "#60A5FA" }}
                           >
-                            {s.twitter}
+                            {row.twitter}
                           </a>
-                        </div>
+                        </span>
                       )}
-                      {s.telegram && (
-                        <div>
-                          <span className="text-gray-400">TG:</span>{" "}
-                          <span>{s.telegram}</span>
-                        </div>
-                      )}
-                      {s.website && (
-                        <div>
-                          <span className="text-gray-400">Web:</span>{" "}
+                      {row.telegram && (
+                        <span>
+                          TG:{" "}
                           <a
-                            href={s.website}
+                            href={
+                              row.telegram.startsWith("http")
+                                ? row.telegram
+                                : `https://t.me/${row.telegram.replace("@", "")}`
+                            }
                             target="_blank"
                             rel="noreferrer"
-                            className="text-sky-400 underline"
+                            style={{ color: "#60A5FA" }}
                           >
-                            {s.website}
+                            {row.telegram}
                           </a>
-                        </div>
+                        </span>
                       )}
-                    </td>
-                    <td className="px-3 py-2">
-                      <div className="flex gap-2">
-                        <button
-                          onClick={() => updateStatus(s.id, "approved")}
-                          className="px-2 py-1 rounded text-xs bg-emerald-600 hover:bg-emerald-500"
-                        >
-                          Approve
-                        </button>
-                        <button
-                          onClick={() => updateStatus(s.id, "rejected")}
-                          className="px-2 py-1 rounded text-xs bg-rose-600 hover:bg-rose-500"
-                        >
-                          Reject
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        )}
-      </div>
+                      {row.website && (
+                        <span>
+                          Web:{" "}
+                          <a
+                            href={row.website}
+                            target="_blank"
+                            rel="noreferrer"
+                            style={{ color: "#60A5FA" }}
+                          >
+                            {row.website}
+                          </a>
+                        </span>
+                      )}
+                    </div>
+                  </td>
+                  <td style={tdStyle}>
+                    <div style={{ display: "flex", gap: "6px" }}>
+                      <button
+                        onClick={() => void updateStatus(row.id, "approved")}
+                        style={approveButtonStyle}
+                      >
+                        Approve
+                      </button>
+                      <button
+                        onClick={() => void updateStatus(row.id, "rejected")}
+                        style={rejectButtonStyle}
+                      >
+                        Reject
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
     </main>
   );
 }
+
+const thStyle: React.CSSProperties = {
+  padding: "10px 12px",
+  fontWeight: 600,
+  fontSize: "12px",
+  color: "#D1D5DB",
+  borderBottom: "1px solid #1F2937",
+  whiteSpace: "nowrap",
+};
+
+const tdStyle: React.CSSProperties = {
+  padding: "8px 12px",
+  verticalAlign: "top",
+  color: "#E5E7EB",
+  fontSize: "13px",
+};
+
+const baseButtonStyle: React.CSSProperties = {
+  padding: "4px 10px",
+  borderRadius: "9999px",
+  border: "none",
+  fontSize: "12px",
+  cursor: "pointer",
+  fontWeight: 500,
+};
+
+const approveButtonStyle: React.CSSProperties = {
+  ...baseButtonStyle,
+  background: "rgba(16,185,129,0.15)",
+  color: "#6EE7B7",
+};
+
+const rejectButtonStyle: React.CSSProperties = {
+  ...baseButtonStyle,
+  background: "rgba(239,68,68,0.15)",
+  color: "#FCA5A5",
+};
