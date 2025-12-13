@@ -240,3 +240,4 @@ export function LivePriceTicker({ onTokenClick }: TickerProps) {
     </div>
   );
 }
+

@@ -179,3 +179,4 @@ export function PriceChartModal({ symbol, isOpen, onClose }: ChartModalProps) {
   // Use portal to render at document body level
   return createPortal(modalContent, document.body);
 }
+

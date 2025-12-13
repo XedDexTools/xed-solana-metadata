@@ -29,3 +29,4 @@ export function StatsCounter() {
     </div>
   );
 }
+

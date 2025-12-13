@@ -60,3 +60,4 @@ export function FAQSection() {
     </div>
   );
 }
+

@@ -37,3 +37,4 @@ export function Navbar({ showStatus }: NavbarProps) {
     </nav>
   );
 }
+

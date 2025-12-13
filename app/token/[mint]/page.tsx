@@ -260,3 +260,4 @@ export default async function TokenPage({ params }: { params: Promise<{ mint: st
     </main>
   );
 }
+

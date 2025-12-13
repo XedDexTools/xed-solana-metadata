@@ -6,6 +6,9 @@ import { StatsCounter } from "@/components/stats-counter";
 import { MobileMenu } from "@/components/mobile-menu";
 import { FAQSection } from "@/components/faq-section";
 import { PriceWidget } from "@/components/price-widget";
+import { RecentTokens } from "@/components/recent-tokens";
+import { ActivityFeed } from "@/components/activity-feed";
+import { SearchAutocomplete } from "@/components/search-autocomplete";
 
 export default function LandingPage() {
   return (
@@ -101,40 +104,73 @@ export default function LandingPage() {
         </div>
       </div>
 
-      {/* Quick Links Section */}
-      <div className="relative z-10 border-t border-white/10 bg-zinc-950 py-16">
+      {/* Search Bar */}
+      <div className="relative z-10 border-t border-white/10 bg-black py-8">
+        <div className="max-w-2xl mx-auto px-6">
+          <SearchAutocomplete placeholder="Search tokens by name, symbol, or mint address..." />
+        </div>
+      </div>
+
+      {/* Recent Tokens */}
+      <div className="relative z-10 border-t border-white/10 bg-zinc-950 py-12">
         <div className="max-w-[1400px] mx-auto px-6">
-          <h2 className="text-sm font-mono text-zinc-500 mb-8 text-center">QUICK ACCESS</h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <Link href="/explorer" className="group border border-white/10 p-8 hover:bg-white/5 transition-colors">
-              <div className="w-12 h-12 bg-zinc-900 flex items-center justify-center mb-4 group-hover:bg-zinc-800 transition-colors">
-                <svg className="w-6 h-6 text-zinc-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/>
-                </svg>
-              </div>
-              <h3 className="font-bold text-lg mb-2 group-hover:underline">Token Explorer</h3>
-              <p className="text-sm text-zinc-400">Browse all approved tokens in the registry</p>
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-sm font-mono text-zinc-500">RECENTLY VERIFIED</h2>
+            <Link href="/explorer" className="text-xs font-mono text-zinc-500 hover:text-white transition-colors">
+              VIEW ALL →
             </Link>
-            
-            <Link href="/status" className="group border border-white/10 p-8 hover:bg-white/5 transition-colors">
-              <div className="w-12 h-12 bg-zinc-900 flex items-center justify-center mb-4 group-hover:bg-zinc-800 transition-colors">
-                <svg className="w-6 h-6 text-zinc-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
-                </svg>
+          </div>
+          <RecentTokens />
+        </div>
+      </div>
+
+      {/* Activity Feed & Quick Links */}
+      <div className="relative z-10 border-t border-white/10 bg-black py-12">
+        <div className="max-w-[1400px] mx-auto px-6">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            {/* Activity Feed */}
+            <div className="lg:col-span-1 order-2 lg:order-1">
+              <h2 className="text-sm font-mono text-zinc-500 mb-4">LIVE ACTIVITY</h2>
+              <div className="border border-white/10 bg-zinc-950 max-h-[400px] overflow-y-auto">
+                <ActivityFeed />
               </div>
-              <h3 className="font-bold text-lg mb-2 group-hover:underline">Status Tracker</h3>
-              <p className="text-sm text-zinc-400">Check the status of your token submission</p>
-            </Link>
-            
-            <Link href="/start" className="group border border-white/10 p-8 hover:bg-white/5 transition-colors">
-              <div className="w-12 h-12 bg-zinc-900 flex items-center justify-center mb-4 group-hover:bg-zinc-800 transition-colors">
-                <svg className="w-6 h-6 text-zinc-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
-                </svg>
+            </div>
+
+            {/* Quick Links */}
+            <div className="lg:col-span-2 order-1 lg:order-2">
+              <h2 className="text-sm font-mono text-zinc-500 mb-4">QUICK ACCESS</h2>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <Link href="/explorer" className="group border border-white/10 p-6 hover:bg-white/5 transition-colors">
+                  <div className="w-10 h-10 bg-zinc-900 flex items-center justify-center mb-3 group-hover:bg-zinc-800 transition-colors">
+                    <svg className="w-5 h-5 text-zinc-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/>
+                    </svg>
+                  </div>
+                  <h3 className="font-bold mb-1 group-hover:underline">Explorer</h3>
+                  <p className="text-xs text-zinc-500">Browse all tokens</p>
+                </Link>
+                
+                <Link href="/status" className="group border border-white/10 p-6 hover:bg-white/5 transition-colors">
+                  <div className="w-10 h-10 bg-zinc-900 flex items-center justify-center mb-3 group-hover:bg-zinc-800 transition-colors">
+                    <svg className="w-5 h-5 text-zinc-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+                    </svg>
+                  </div>
+                  <h3 className="font-bold mb-1 group-hover:underline">Status</h3>
+                  <p className="text-xs text-zinc-500">Track submissions</p>
+                </Link>
+                
+                <Link href="/start" className="group border border-white/10 p-6 hover:bg-white/5 transition-colors">
+                  <div className="w-10 h-10 bg-zinc-900 flex items-center justify-center mb-3 group-hover:bg-zinc-800 transition-colors">
+                    <svg className="w-5 h-5 text-zinc-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+                    </svg>
+                  </div>
+                  <h3 className="font-bold mb-1 group-hover:underline">Submit</h3>
+                  <p className="text-xs text-zinc-500">Register for free</p>
+                </Link>
               </div>
-              <h3 className="font-bold text-lg mb-2 group-hover:underline">Submit Token</h3>
-              <p className="text-sm text-zinc-400">Register your token metadata for free</p>
-            </Link>
+            </div>
           </div>
         </div>
       </div>
