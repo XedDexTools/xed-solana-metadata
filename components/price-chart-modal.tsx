@@ -54,17 +54,30 @@ export function PriceChartModal({ symbol, isOpen, onClose }: ChartModalProps) {
     });
 
     containerRef.current.appendChild(script);
+
+    // Prevent body scroll when modal is open
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = "";
+    };
   }, [isOpen, symbol]);
 
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+    <div className="fixed inset-0 flex items-center justify-center p-4" style={{ zIndex: 9999 }}>
       {/* Backdrop */}
-      <div className="absolute inset-0 bg-black/90 backdrop-blur-sm" onClick={onClose} />
+      <div 
+        className="absolute inset-0 bg-black/95" 
+        onClick={onClose}
+        style={{ zIndex: 9999 }}
+      />
 
       {/* Modal */}
-      <div className="relative bg-zinc-950 border border-zinc-800 w-full max-w-5xl h-[80vh] flex flex-col">
+      <div 
+        className="relative bg-zinc-950 border border-zinc-800 w-full max-w-5xl h-[80vh] flex flex-col"
+        style={{ zIndex: 10000 }}
+      >
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-zinc-800">
           <div className="flex items-center gap-3">
