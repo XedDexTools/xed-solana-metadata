@@ -4,6 +4,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { CopyButton } from "@/components/copy-button";
 import { Navbar } from "@/components/navbar";
+import { TokenActions } from "@/components/token-actions";
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
@@ -45,19 +46,23 @@ export async function generateMetadata({ params }: { params: Promise<{ mint: str
     };
   }
 
+  const ogImageUrl = `https://xedscreener.xyz/api/og?name=${encodeURIComponent(token.name)}&symbol=${encodeURIComponent(token.symbol)}&image=${encodeURIComponent(token.image || "")}&description=${encodeURIComponent(token.description?.slice(0, 100) || "")}`;
+
   return {
     title: `${token.name} ($${token.symbol}) - XED Screener`,
     description: token.description?.slice(0, 160) || `View ${token.name} token metadata on XED Screener.`,
     openGraph: {
-      title: `${token.name} ($${token.symbol})`,
+      title: `${token.name} ($${token.symbol}) - Verified on XED Screener`,
       description: token.description?.slice(0, 160) || `View ${token.name} token metadata on XED Screener.`,
-      images: token.image ? [{ url: token.image }] : [],
+      images: [{ url: ogImageUrl, width: 1200, height: 630, alt: `${token.name} token` }],
+      type: "website",
     },
     twitter: {
       card: "summary_large_image",
       title: `${token.name} ($${token.symbol})`,
       description: token.description?.slice(0, 160) || `View ${token.name} token metadata on XED Screener.`,
-      images: token.image ? [token.image] : [],
+      images: [ogImageUrl],
+      creator: "@XEDscreener",
     },
   };
 }
@@ -122,12 +127,13 @@ export default async function TokenPage({ params }: { params: Promise<{ mint: st
                     <h1 className="text-3xl md:text-4xl font-bold">{token.name}</h1>
                     <span className="text-lg font-mono text-zinc-500 bg-zinc-900 px-3 py-1">${token.symbol}</span>
                   </div>
-                  <div className="flex items-center gap-2 mb-4">
+                  <div className="flex items-center gap-3 mb-4 flex-wrap">
                     <span className="inline-flex items-center gap-1.5 px-2 py-1 bg-green-500/20 text-green-400 text-xs font-mono">
                       <span className="w-1.5 h-1.5 rounded-full bg-green-500" />
                       VERIFIED
                     </span>
                     <span className="text-xs text-zinc-500 font-mono">Added {createdDate}</span>
+                    <TokenActions mint={token.mint} name={token.name} symbol={token.symbol} image={token.image} />
                   </div>
                 </div>
               </div>
