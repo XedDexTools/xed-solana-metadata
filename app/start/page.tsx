@@ -9,6 +9,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import Link from "next/link";
+import { PriceWidget } from "@/components/price-widget";
 
 type UploadState = "idle" | "uploading" | "done";
 
@@ -405,10 +406,15 @@ export default function StartPage() {
       {/* Navbar */}
       <nav className="border-b border-white/10 bg-black">
         <div className="max-w-[1400px] mx-auto px-6 h-16 flex items-center justify-between">
-          <Link href="/" className="flex items-center gap-2 group">
-            <div className="w-5 h-5 bg-white group-hover:bg-zinc-300 transition-colors" />
-            <span className="font-bold tracking-tight text-lg">XED SCREENER</span>
-          </Link>
+          <div className="flex items-center gap-4">
+            <Link href="/" className="flex items-center gap-2 group">
+              <div className="w-5 h-5 bg-white group-hover:bg-zinc-300 transition-colors" />
+              <span className="font-bold tracking-tight text-lg">XED SCREENER</span>
+            </Link>
+            <div className="hidden lg:block border-l border-white/10 pl-4">
+              <PriceWidget />
+            </div>
+          </div>
           <div className="hidden md:flex items-center gap-4">
             <span className="font-mono text-xs text-zinc-500">
               {draftSaved ? "DRAFT_SAVED" : "SECURE_CONNECTION"}

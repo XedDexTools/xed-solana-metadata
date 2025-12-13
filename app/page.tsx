@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { StatsCounter } from "@/components/stats-counter";
 import { MobileMenu } from "@/components/mobile-menu";
 import { FAQSection } from "@/components/faq-section";
+import { PriceWidget } from "@/components/price-widget";
 
 export default function LandingPage() {
   return (
@@ -16,9 +17,15 @@ export default function LandingPage() {
       {/* Navbar */}
       <nav className="relative z-10 border-b border-white/10 bg-black/50 backdrop-blur-md">
         <div className="max-w-[1400px] mx-auto px-6 h-16 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <div className="w-5 h-5 bg-white" />
-            <span className="font-bold tracking-tight text-lg">XED SCREENER</span>
+          <div className="flex items-center gap-4">
+            <div className="flex items-center gap-2">
+              <div className="w-5 h-5 bg-white" />
+              <span className="font-bold tracking-tight text-lg">XED SCREENER</span>
+            </div>
+            {/* Live Price Ticker */}
+            <div className="hidden lg:block border-l border-white/10 pl-4">
+              <PriceWidget />
+            </div>
           </div>
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center gap-6">

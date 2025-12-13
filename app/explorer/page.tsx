@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import Link from "next/link";
+import { PriceWidget } from "@/components/price-widget";
 
 type Token = {
   id: string;
@@ -133,10 +134,15 @@ export default function ExplorerPage() {
 
       <nav className="border-b border-white/10 bg-black">
         <div className="max-w-[1400px] mx-auto px-6 h-16 flex items-center justify-between">
-          <Link href="/" className="flex items-center gap-2 group">
-            <div className="w-5 h-5 bg-white group-hover:bg-zinc-300 transition-colors" />
-            <span className="font-bold tracking-tight text-lg">XED SCREENER</span>
-          </Link>
+          <div className="flex items-center gap-4">
+            <Link href="/" className="flex items-center gap-2 group">
+              <div className="w-5 h-5 bg-white group-hover:bg-zinc-300 transition-colors" />
+              <span className="font-bold tracking-tight text-lg">XED SCREENER</span>
+            </Link>
+            <div className="hidden lg:block border-l border-white/10 pl-4">
+              <PriceWidget />
+            </div>
+          </div>
           <div className="hidden md:flex items-center gap-6">
             <Link href="/start" className="text-sm text-zinc-400 hover:text-white transition-colors">Submit Token</Link>
             <Link href="/status" className="text-sm text-zinc-400 hover:text-white transition-colors">Check Status</Link>

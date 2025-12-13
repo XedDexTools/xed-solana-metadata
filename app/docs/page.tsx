@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
+import { PriceWidget } from "@/components/price-widget";
 
 export default function DocsPage() {
   const scrollToSection = (id: string) => {
@@ -20,10 +21,15 @@ export default function DocsPage() {
       {/* Navbar */}
       <nav className="relative z-10 border-b border-white/10 bg-black/80 backdrop-blur-sm sticky top-0">
         <div className="max-w-[1400px] mx-auto px-6 h-16 flex items-center justify-between">
-          <Link href="/" className="flex items-center gap-2 group">
-            <div className="w-5 h-5 bg-white group-hover:bg-zinc-300 transition-colors" />
-            <span className="font-bold tracking-tight text-lg">XED SCREENER</span>
-          </Link>
+          <div className="flex items-center gap-4">
+            <Link href="/" className="flex items-center gap-2 group">
+              <div className="w-5 h-5 bg-white group-hover:bg-zinc-300 transition-colors" />
+              <span className="font-bold tracking-tight text-lg">XED SCREENER</span>
+            </Link>
+            <div className="hidden lg:block border-l border-white/10 pl-4">
+              <PriceWidget />
+            </div>
+          </div>
           <div className="hidden md:flex items-center gap-6">
             <span className="font-mono text-xs text-zinc-500">SYSTEM_DOCS_V1.2.4</span>
             <a href="https://x.com/XEDscreener" target="_blank" rel="noopener noreferrer" className="text-zinc-400 hover:text-white transition-colors">
