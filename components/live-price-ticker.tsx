@@ -23,44 +23,99 @@ export function LivePriceTicker({ onTokenClick }: TickerProps) {
   const [flashStates, setFlashStates] = useState<Record<string, "up" | "down" | null>>({});
   const prevPrices = useRef<Record<string, number>>({});
   const wsRef = useRef<WebSocket | null>(null);
-  const reconnectTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-  // Fetch initial prices via REST API
-  const fetchInitialPrices = useCallback(async () => {
+  // Fetch prices via CoinGecko (better CORS support)
+  const fetchPrices = useCallback(async () => {
     try {
-      const symbols = TOKENS.map(t => t.binanceSymbol);
       const response = await fetch(
-        `https://api.binance.com/api/v3/ticker/24hr?symbols=${JSON.stringify(symbols)}`
+        "https://api.coingecko.com/api/v3/simple/price?ids=solana,bitcoin,ethereum&vs_currencies=usd&include_24hr_change=true",
+        { cache: "no-store" }
       );
+      
+      if (!response.ok) throw new Error("API error");
+      
       const data = await response.json();
       
-      if (Array.isArray(data)) {
-        const newPrices: Record<string, PriceData> = {};
-        data.forEach((ticker: { symbol: string; lastPrice: string; priceChangePercent: string }) => {
-          const symbol = ticker.symbol.replace("USDT", "");
-          const price = parseFloat(ticker.lastPrice);
-          const change24h = parseFloat(ticker.priceChangePercent);
-          newPrices[symbol] = { symbol, price, change24h };
-          prevPrices.current[symbol] = price;
-        });
-        setPrices(newPrices);
+      const newPrices: Record<string, PriceData> = {};
+      
+      if (data.solana) {
+        const price = data.solana.usd;
+        const prevPrice = prevPrices.current["SOL"] || price;
+        if (price !== prevPrice) {
+          setFlashStates(prev => ({ ...prev, SOL: price > prevPrice ? "up" : "down" }));
+          setTimeout(() => setFlashStates(prev => ({ ...prev, SOL: null })), 300);
+        }
+        prevPrices.current["SOL"] = price;
+        newPrices["SOL"] = { symbol: "SOL", price, change24h: data.solana.usd_24h_change || 0 };
       }
+      
+      if (data.bitcoin) {
+        const price = data.bitcoin.usd;
+        const prevPrice = prevPrices.current["BTC"] || price;
+        if (price !== prevPrice) {
+          setFlashStates(prev => ({ ...prev, BTC: price > prevPrice ? "up" : "down" }));
+          setTimeout(() => setFlashStates(prev => ({ ...prev, BTC: null })), 300);
+        }
+        prevPrices.current["BTC"] = price;
+        newPrices["BTC"] = { symbol: "BTC", price, change24h: data.bitcoin.usd_24h_change || 0 };
+      }
+      
+      if (data.ethereum) {
+        const price = data.ethereum.usd;
+        const prevPrice = prevPrices.current["ETH"] || price;
+        if (price !== prevPrice) {
+          setFlashStates(prev => ({ ...prev, ETH: price > prevPrice ? "up" : "down" }));
+          setTimeout(() => setFlashStates(prev => ({ ...prev, ETH: null })), 300);
+        }
+        prevPrices.current["ETH"] = price;
+        newPrices["ETH"] = { symbol: "ETH", price, change24h: data.ethereum.usd_24h_change || 0 };
+      }
+      
+      setPrices(newPrices);
     } catch (error) {
-      console.error("Failed to fetch initial prices:", error);
+      console.error("Failed to fetch prices:", error);
+      // Try Binance as fallback
+      tryBinanceFallback();
     }
   }, []);
 
-  // Connect to WebSocket for real-time updates
+  const tryBinanceFallback = async () => {
+    try {
+      const results = await Promise.all(
+        TOKENS.map(async (token) => {
+          const res = await fetch(`https://api.binance.com/api/v3/ticker/24hr?symbol=${token.binanceSymbol}`);
+          return res.json();
+        })
+      );
+      
+      const newPrices: Record<string, PriceData> = {};
+      results.forEach((data, i) => {
+        if (data.lastPrice) {
+          const symbol = TOKENS[i].symbol;
+          newPrices[symbol] = {
+            symbol,
+            price: parseFloat(data.lastPrice),
+            change24h: parseFloat(data.priceChangePercent) || 0,
+          };
+          prevPrices.current[symbol] = parseFloat(data.lastPrice);
+        }
+      });
+      
+      if (Object.keys(newPrices).length > 0) {
+        setPrices(newPrices);
+      }
+    } catch (err) {
+      console.error("Binance fallback failed:", err);
+    }
+  };
+
+  // Connect WebSocket for real-time updates
   const connectWebSocket = useCallback(() => {
     if (wsRef.current?.readyState === WebSocket.OPEN) return;
 
     try {
       const streams = TOKENS.map((t) => `${t.binanceSymbol.toLowerCase()}@ticker`).join("/");
       const ws = new WebSocket(`wss://stream.binance.com:9443/ws/${streams}`);
-
-      ws.onopen = () => {
-        console.log("Price WebSocket connected");
-      };
 
       ws.onmessage = (event) => {
         try {
@@ -72,66 +127,59 @@ export function LivePriceTicker({ onTokenClick }: TickerProps) {
           if (!symbol || isNaN(price)) return;
 
           const prevPrice = prevPrices.current[symbol] || price;
-          const direction: "up" | "down" | "neutral" =
-            price > prevPrice ? "up" : price < prevPrice ? "down" : "neutral";
-
-          // Trigger flash animation
-          if (direction !== "neutral") {
-            setFlashStates((prev) => ({ ...prev, [symbol]: direction }));
+          
+          if (price !== prevPrice) {
+            setFlashStates((prev) => ({ 
+              ...prev, 
+              [symbol]: price > prevPrice ? "up" : "down" 
+            }));
             setTimeout(() => {
               setFlashStates((prev) => ({ ...prev, [symbol]: null }));
             }, 300);
           }
 
           prevPrices.current[symbol] = price;
-
           setPrices((prev) => ({
             ...prev,
             [symbol]: { symbol, price, change24h },
           }));
         } catch (err) {
-          console.error("WebSocket parse error:", err);
+          // Ignore parse errors
         }
       };
 
-      ws.onerror = (error) => {
-        console.error("WebSocket error:", error);
-      };
-
       ws.onclose = () => {
-        console.log("WebSocket closed, reconnecting in 5s...");
         wsRef.current = null;
-        reconnectTimeoutRef.current = setTimeout(connectWebSocket, 5000);
+        setTimeout(connectWebSocket, 5000);
       };
 
       wsRef.current = ws;
     } catch (error) {
-      console.error("Failed to create WebSocket:", error);
-      reconnectTimeoutRef.current = setTimeout(connectWebSocket, 5000);
+      setTimeout(connectWebSocket, 5000);
     }
   }, []);
 
   useEffect(() => {
-    // Fetch initial prices immediately
-    fetchInitialPrices();
+    // Fetch prices immediately
+    fetchPrices();
     
-    // Then connect WebSocket for real-time updates
-    const wsTimer = setTimeout(connectWebSocket, 1000);
+    // Poll every 10 seconds as backup
+    const pollInterval = setInterval(fetchPrices, 10000);
+    
+    // Connect WebSocket for real-time
+    const wsTimer = setTimeout(connectWebSocket, 2000);
 
     return () => {
+      clearInterval(pollInterval);
       clearTimeout(wsTimer);
-      if (reconnectTimeoutRef.current) {
-        clearTimeout(reconnectTimeoutRef.current);
-      }
       if (wsRef.current) {
         wsRef.current.close();
       }
     };
-  }, [fetchInitialPrices, connectWebSocket]);
+  }, [fetchPrices, connectWebSocket]);
 
   const formatPrice = (price: number, symbol: string) => {
     if (symbol === "BTC") {
-      // Format as $90.1K for large numbers
       if (price >= 1000) {
         return `$${(price / 1000).toFixed(1)}K`;
       }
@@ -140,12 +188,11 @@ export function LivePriceTicker({ onTokenClick }: TickerProps) {
     if (symbol === "ETH") {
       return `$${price.toFixed(0)}`;
     }
-    // SOL - show 2 decimals
     return `$${price.toFixed(2)}`;
   };
 
   return (
-    <div className="flex items-center gap-1">
+    <div className="flex items-center gap-0.5">
       {TOKENS.map((token) => {
         const data = prices[token.symbol];
         const flash = flashStates[token.symbol];
@@ -156,17 +203,17 @@ export function LivePriceTicker({ onTokenClick }: TickerProps) {
             key={token.symbol}
             onClick={() => onTokenClick?.(token.symbol)}
             className={`
-              flex items-center gap-1.5 px-2 py-1.5 rounded transition-all duration-150
+              flex items-center gap-1 px-2 py-1 rounded transition-all duration-150
               hover:bg-zinc-800 cursor-pointer
               ${flash === "up" ? "bg-green-500/30" : ""}
               ${flash === "down" ? "bg-red-500/30" : ""}
             `}
           >
-            <span className="text-sm opacity-70">{token.icon}</span>
+            <span className="text-xs opacity-60">{token.icon}</span>
             {data ? (
               <>
                 <span
-                  className={`text-sm font-semibold tabular-nums transition-colors ${
+                  className={`text-xs font-semibold tabular-nums transition-colors ${
                     flash === "up"
                       ? "text-green-400"
                       : flash === "down"
@@ -177,7 +224,7 @@ export function LivePriceTicker({ onTokenClick }: TickerProps) {
                   {formatPrice(data.price, token.symbol)}
                 </span>
                 <span
-                  className={`text-xs font-medium hidden xl:inline ${
+                  className={`text-[10px] font-medium hidden xl:inline ${
                     isUp ? "text-green-500" : "text-red-500"
                   }`}
                 >
@@ -185,7 +232,7 @@ export function LivePriceTicker({ onTokenClick }: TickerProps) {
                 </span>
               </>
             ) : (
-              <span className="text-sm text-zinc-600 animate-pulse">...</span>
+              <span className="text-xs text-zinc-500">...</span>
             )}
           </button>
         );
