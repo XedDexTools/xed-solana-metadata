@@ -73,7 +73,7 @@ Open [http://localhost:3000](http://localhost:3000) to see the application.
 
 ### Environment Variables
 
-Create a `.env.local` file:
+Create a `.env.local` file (never commit this to git):
 
 ```env
 # Supabase
@@ -83,6 +83,8 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
 # Admin (server-side only, no NEXT_PUBLIC prefix)
 ADMIN_PASSWORD=your_secure_password
 ```
+
+> ⚠️ **Important:** Never commit `.env.local` or expose real credentials. The values above are placeholders only.
 
 ---
 
@@ -171,7 +173,6 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 - **Live Site:** [xedscreener.xyz](https://xedscreener.xyz)
 - **Documentation:** [xedscreener.xyz/docs](https://xedscreener.xyz/docs)
-- **Admin Panel:** [xedscreener.xyz/admin](https://xedscreener.xyz/admin)
 
 ---
 

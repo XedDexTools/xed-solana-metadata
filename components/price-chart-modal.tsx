@@ -23,11 +23,7 @@ const NAMES: Record<string, string> = {
 
 export function PriceChartModal({ symbol, isOpen, onClose }: ChartModalProps) {
   const containerRef = useRef<HTMLDivElement>(null);
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
+  const [mounted] = useState(typeof window !== "undefined");
 
   useEffect(() => {
     if (!isOpen) return;

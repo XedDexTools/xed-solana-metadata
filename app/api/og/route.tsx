@@ -49,8 +49,9 @@ export async function GET(request: NextRequest) {
             flex: 1,
           }}
         >
-          {/* Token Image */}
+          {/* Token Image - must use img for OG image generation */}
           {image ? (
+            // eslint-disable-next-line @next/next/no-img-element
             <img
               src={image}
               alt={name}

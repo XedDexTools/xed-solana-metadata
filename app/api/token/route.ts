@@ -13,10 +13,6 @@ type TokenMetadataResponse = {
   updatedAt: string; // created_at from the DB
 };
 
-type ErrorResponse = {
-  error: string;
-};
-
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
   const mint = searchParams.get("mint");

@@ -14,7 +14,6 @@ export async function GET(request: NextRequest) {
     const limit = Math.min(parseInt(searchParams.get("limit") || "20"), 50);
     const search = searchParams.get("search") || "";
     const sortBy = searchParams.get("sort") || "newest";
-    const dateFilter = searchParams.get("date") || "all";
 
     const offset = (page - 1) * limit;
 
@@ -23,34 +22,10 @@ export async function GET(request: NextRequest) {
       .select("id, mint, wallet, name, symbol, description, image, twitter, telegram, website, created_at", { count: "exact" })
       .eq("status", "approved");
 
-    // Search filter
     if (search) {
       query = query.or(`name.ilike.%${search}%,symbol.ilike.%${search}%,mint.ilike.%${search}%`);
     }
 
-    // Date filter
-    if (dateFilter !== "all") {
-      const now = new Date();
-      let dateThreshold: Date;
-
-      switch (dateFilter) {
-        case "today":
-          dateThreshold = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-          break;
-        case "week":
-          dateThreshold = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
-          break;
-        case "month":
-          dateThreshold = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
-          break;
-        default:
-          dateThreshold = new Date(0);
-      }
-
-      query = query.gte("created_at", dateThreshold.toISOString());
-    }
-
-    // Sorting
     if (sortBy === "newest") {
       query = query.order("created_at", { ascending: false });
     } else if (sortBy === "oldest") {
@@ -105,3 +80,4 @@ export async function GET(request: NextRequest) {
     );
   }
 }
+

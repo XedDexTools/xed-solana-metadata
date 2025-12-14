@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState, useMemo, useRef } from "react";
 import { supabase } from "../../lib/supabaseClient";
 import Link from "next/link";
 
@@ -23,34 +23,30 @@ const ITEMS_PER_PAGE = 20;
 
 export default function AdminPage() {
   const [password, setPassword] = useState("");
-  const [hasAccess, setHasAccess] = useState(false);
+  const [hasAccess, setHasAccess] = useState(() => {
+    if (typeof window !== "undefined") {
+      return window.localStorage.getItem("xed_admin_authed") === "true";
+    }
+    return false;
+  });
   const [submissions, setSubmissions] = useState<Submission[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const initialLoadDone = useRef(false);
   
   // Filters
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState<"all" | "pending" | "approved" | "rejected">("all");
   const [currentPage, setCurrentPage] = useState(1);
   
+  // Track previous filter values to reset page
+  const [prevSearchQuery, setPrevSearchQuery] = useState("");
+  const [prevStatusFilter, setPrevStatusFilter] = useState<"all" | "pending" | "approved" | "rejected">("all");
+  
   // Modal state
   const [selectedSubmission, setSelectedSubmission] = useState<Submission | null>(null);
 
-  useEffect(() => {
-    if (typeof window === "undefined") return;
-    const stored = window.localStorage.getItem("xed_admin_authed");
-    if (stored === "true") {
-      setHasAccess(true);
-    }
-  }, []);
-
-  useEffect(() => {
-    if (hasAccess) {
-      void fetchSubmissions();
-    }
-  }, [hasAccess]);
-
-  async function fetchSubmissions() {
+  const fetchSubmissions = async () => {
     setLoading(true);
     setError(null);
 
@@ -67,7 +63,16 @@ export default function AdminPage() {
     }
 
     setLoading(false);
-  }
+  };
+
+  // Initial load - fetching data on mount is a valid pattern
+  useEffect(() => {
+    if (hasAccess && !initialLoadDone.current) {
+      initialLoadDone.current = true;
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      void fetchSubmissions();
+    }
+  }, [hasAccess]);
 
   async function handleLogin(e: React.FormEvent) {
     e.preventDefault();
@@ -183,10 +188,14 @@ export default function AdminPage() {
     rejected: submissions.filter((s) => s.status === "rejected").length,
   }), [submissions]);
 
-  // Reset page when filters change
-  useEffect(() => {
-    setCurrentPage(1);
-  }, [searchQuery, statusFilter]);
+  // Reset page when filters change (derived state pattern)
+  if (searchQuery !== prevSearchQuery || statusFilter !== prevStatusFilter) {
+    setPrevSearchQuery(searchQuery);
+    setPrevStatusFilter(statusFilter);
+    if (currentPage !== 1) {
+      setCurrentPage(1);
+    }
+  }
 
   if (!hasAccess) {
     return (

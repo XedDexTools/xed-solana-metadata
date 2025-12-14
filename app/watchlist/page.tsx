@@ -1,10 +1,10 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { PriceWidget } from "@/components/price-widget";
-import { WatchlistButton, getWatchlist, removeFromWatchlist } from "@/components/watchlist-button";
+import { getWatchlist, removeFromWatchlist } from "@/components/watchlist-button";
 
 type WatchlistItem = {
   mint: string;
@@ -15,13 +15,13 @@ type WatchlistItem = {
 };
 
 export default function WatchlistPage() {
-  const [watchlist, setWatchlist] = useState<WatchlistItem[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    setWatchlist(getWatchlist());
-    setLoading(false);
-  }, []);
+  const [watchlist, setWatchlist] = useState<WatchlistItem[]>(() => {
+    if (typeof window !== "undefined") {
+      return getWatchlist();
+    }
+    return [];
+  });
+  const [loading] = useState(false);
 
   const handleRemove = (mint: string) => {
     removeFromWatchlist(mint);

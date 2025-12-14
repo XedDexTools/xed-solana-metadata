@@ -181,14 +181,14 @@ export async function POST(request: NextRequest) {
       },
       { status: 200 }
     );
-  } catch (err: any) {
+  } catch (err: unknown) {
     console.error("Submit error:", err);
 
     let message = "Network or upload error. Please try again.";
 
     if (err && typeof err === "object") {
-      if ("message" in err && typeof err.message === "string") {
-        message = err.message;
+      if ("message" in err && typeof (err as { message: unknown }).message === "string") {
+        message = (err as { message: string }).message;
       } else {
         try {
           message = JSON.stringify(err);

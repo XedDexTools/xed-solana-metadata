@@ -152,7 +152,7 @@ const ENDPOINTS: Endpoint[] = [
   },
 ];
 
-function CodeBlock({ code, language = "javascript" }: { code: string; language?: string }) {
+function CodeBlock({ code, language: _language = "javascript" }: { code: string; language?: string }) {
   const [copied, setCopied] = useState(false);
 
   const handleCopy = () => {

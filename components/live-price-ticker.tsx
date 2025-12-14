@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState, useRef, useCallback } from "react";
+import Image from "next/image";
 
 type PriceData = {
   symbol: string;
@@ -13,9 +14,9 @@ type TickerProps = {
 };
 
 const TOKENS = [
-  { symbol: "SOL", binanceSymbol: "SOLUSDT", coingeckoId: "solana", icon: "◎" },
-  { symbol: "BTC", binanceSymbol: "BTCUSDT", coingeckoId: "bitcoin", icon: "₿" },
-  { symbol: "ETH", binanceSymbol: "ETHUSDT", coingeckoId: "ethereum", icon: "Ξ" },
+  { symbol: "SOL", binanceSymbol: "SOLUSDT", coingeckoId: "solana", icon: "/sol-logo.svg" },
+  { symbol: "BTC", binanceSymbol: "BTCUSDT", coingeckoId: "bitcoin", icon: "/btc-logo.svg" },
+  { symbol: "ETH", binanceSymbol: "ETHUSDT", coingeckoId: "ethereum", icon: "/eth-logo.svg" },
 ];
 
 export function LivePriceTicker({ onTokenClick }: TickerProps) {
@@ -77,7 +78,7 @@ export function LivePriceTicker({ onTokenClick }: TickerProps) {
         setError(false);
         retryCount.current = 0;
       }
-    } catch (err) {
+    } catch {
       // Silently handle errors - don't spam console
       if (retryCount.current < 3) {
         retryCount.current++;
@@ -201,7 +202,13 @@ export function LivePriceTicker({ onTokenClick }: TickerProps) {
               ${flash === "down" ? "bg-red-500/30" : ""}
             `}
           >
-            <span className="text-xs opacity-60">{token.icon}</span>
+            <Image 
+              src={token.icon} 
+              alt={token.symbol} 
+              width={16}
+              height={16}
+              className="rounded-full"
+            />
             {data ? (
               <>
                 <span

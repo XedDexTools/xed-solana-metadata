@@ -301,7 +301,7 @@ export default function DocsPage() {
                     <td className="p-4 text-white">wallet</td>
                     <td className="p-4 text-blue-400">varchar(44)</td>
                     <td className="p-4 text-zinc-500">NOT NULL</td>
-                    <td className="p-4 text-zinc-400">Submitter's public key</td>
+                    <td className="p-4 text-zinc-400">Submitter&apos;s public key</td>
                   </tr>
                   <tr className="hover:bg-zinc-900/20">
                     <td className="p-4 text-white">mint</td>
@@ -318,7 +318,7 @@ export default function DocsPage() {
                   <tr className="hover:bg-zinc-900/20">
                     <td className="p-4 text-white">status</td>
                     <td className="p-4 text-blue-400">enum</td>
-                    <td className="p-4 text-zinc-500">DEFAULT 'pending'</td>
+                    <td className="p-4 text-zinc-500">DEFAULT &apos;pending&apos;</td>
                     <td className="p-4 text-zinc-400">Lifecycle state (pending → approved/rejected)</td>
                   </tr>
                 </tbody>

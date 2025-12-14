@@ -1,6 +1,5 @@
 import "@/styles/globals.css";
 import type { Metadata } from "next";
-import { ToastProvider } from "@/components/toast";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://xedscreener.xyz"),
@@ -71,9 +70,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className="dark">
-      <body className="antialiased">
-        <ToastProvider>{children}</ToastProvider>
-      </body>
+      <body className="antialiased">{children}</body>
     </html>
   );
 }
