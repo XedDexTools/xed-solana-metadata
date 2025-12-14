@@ -5,6 +5,7 @@ import { notFound } from "next/navigation";
 import { CopyButton } from "@/components/copy-button";
 import { Navbar } from "@/components/navbar";
 import { TokenActions } from "@/components/token-actions";
+import { MarketData } from "@/components/market-data";
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
@@ -137,6 +138,9 @@ export default async function TokenPage({ params }: { params: Promise<{ mint: st
                   </div>
                 </div>
               </div>
+
+              {/* Market Data */}
+              <MarketData mint={token.mint} />
 
               {/* Description */}
               <div className="border border-white/10 bg-zinc-950 p-6">
