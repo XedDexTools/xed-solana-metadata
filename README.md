@@ -182,4 +182,4 @@ For issues, questions, or contributions, please open an [Issue](https://github.c
 
 ---
 
-**Built for the Solana community. Free forever. No gatekeepers. No $300 fees.**
+**Built for the Solana community. Free forever. No $300 fees.**
