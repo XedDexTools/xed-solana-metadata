@@ -1,16 +1,41 @@
 {
   "name": "XED Screener",
   "short_name": "XED",
-  "description": "Free Solana Token Metadata Registry",
+  "description": "Free Solana Token Metadata Registry - No $300 fees",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#000000",
   "theme_color": "#000000",
+  "orientation": "portrait-primary",
+  "categories": ["finance", "utilities"],
   "icons": [
     {
       "src": "/favicon.ico",
       "sizes": "64x64",
       "type": "image/x-icon"
+    },
+    {
+      "src": "/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ],
+  "screenshots": [],
+  "shortcuts": [
+    {
+      "name": "Submit Token",
+      "short_name": "Submit",
+      "description": "Submit your token metadata",
+      "url": "/start",
+      "icons": []
+    },
+    {
+      "name": "Explorer",
+      "short_name": "Explore",
+      "description": "Browse all tokens",
+      "url": "/explorer",
+      "icons": []
     }
   ]
 }

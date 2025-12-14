@@ -1,11 +1,35 @@
 import { NextRequest, NextResponse } from "next/server";
 import { supabase } from "../../../lib/supabaseClient";
+import { rateLimit, getClientIP, RATE_LIMITS } from "../../../lib/rate-limit";
 
 // 3 hour cooldown in milliseconds
 const COOLDOWN_MS = 3 * 60 * 60 * 1000;
 
 export async function POST(request: NextRequest) {
   try {
+    // Rate limiting - 5 submissions per minute per IP
+    const clientIP = getClientIP(request);
+    const rateLimitResult = rateLimit(`submit:${clientIP}`, RATE_LIMITS.STRICT);
+    
+    if (!rateLimitResult.success) {
+      return NextResponse.json(
+        {
+          error: "Too many requests",
+          message: "Please wait a moment before submitting again.",
+          retryAfter: Math.ceil((rateLimitResult.resetTime - Date.now()) / 1000),
+        },
+        { 
+          status: 429,
+          headers: {
+            "X-RateLimit-Limit": String(rateLimitResult.limit),
+            "X-RateLimit-Remaining": "0",
+            "X-RateLimit-Reset": String(rateLimitResult.resetTime),
+            "Retry-After": String(Math.ceil((rateLimitResult.resetTime - Date.now()) / 1000)),
+          },
+        }
+      );
+    }
+
     const body = await request.json();
     
     const {

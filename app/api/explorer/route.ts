@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
+import { rateLimit, getClientIP, RATE_LIMITS } from "@/lib/rate-limit";
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
@@ -9,6 +10,17 @@ export const dynamic = "force-dynamic";
 
 export async function GET(request: NextRequest) {
   try {
+    // Rate limiting - 100 requests per minute
+    const clientIP = getClientIP(request);
+    const rateLimitResult = rateLimit(`explorer:${clientIP}`, RATE_LIMITS.RELAXED);
+    
+    if (!rateLimitResult.success) {
+      return NextResponse.json(
+        { error: "Rate limit exceeded", tokens: [], pagination: { page: 1, total: 0, hasNext: false, hasPrev: false } },
+        { status: 429 }
+      );
+    }
+
     const { searchParams } = new URL(request.url);
     const page = parseInt(searchParams.get("page") || "1");
     const limit = Math.min(parseInt(searchParams.get("limit") || "20"), 50);

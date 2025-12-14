@@ -1,5 +1,6 @@
 import "@/styles/globals.css";
 import type { Metadata } from "next";
+import { Analytics } from "@vercel/analytics/react";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://xedscreener.xyz"),
@@ -70,7 +71,16 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className="dark">
-      <body className="antialiased">{children}</body>
+      <head>
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+        <meta name="apple-mobile-web-app-title" content="XED Screener" />
+        <link rel="apple-touch-icon" href="/icon.svg" />
+      </head>
+      <body className="antialiased">
+        {children}
+        <Analytics />
+      </body>
     </html>
   );
 }
