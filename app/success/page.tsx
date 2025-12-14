@@ -5,10 +5,15 @@ import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { PriceWidget } from "@/components/price-widget";
+import { Confetti } from "@/components/confetti";
+import { AuroraBackground } from "@/components/aurora-background";
+import { ScrollReveal } from "@/components/scroll-reveal";
+import { GradientText } from "@/components/gradient-text";
 
 function SuccessContent() {
   const searchParams = useSearchParams();
   const [copied, setCopied] = useState<string | null>(null);
+  const [showConfetti, setShowConfetti] = useState(false);
 
   const mint = searchParams.get("mint") || "";
   const name = searchParams.get("name") || "Your Token";
@@ -18,6 +23,8 @@ function SuccessContent() {
     if (typeof window !== "undefined") {
       localStorage.removeItem("xed-form-draft");
     }
+    // Trigger confetti after a small delay
+    setTimeout(() => setShowConfetti(true), 300);
   }, []);
 
   const handleCopy = (text: string, type: string) => {
@@ -33,14 +40,20 @@ function SuccessContent() {
 
   return (
     <main className="min-h-screen bg-black text-white font-sans flex flex-col relative overflow-hidden">
-      <div className="fixed inset-0 arc-grid pointer-events-none z-0 opacity-30" />
+      {/* Confetti Celebration! */}
+      <Confetti trigger={showConfetti} duration={4000} particleCount={150} />
+      
+      {/* Aurora Background */}
+      <AuroraBackground />
+      
+      <div className="fixed inset-0 arc-grid pointer-events-none z-0 opacity-20" />
       <div className="scanline" />
 
-      <nav className="border-b border-white/10 bg-black">
+      <nav className="relative z-10 border-b border-white/10 bg-black/50 backdrop-blur-md">
         <div className="max-w-[1400px] mx-auto px-6 h-16 flex items-center justify-between">
           <div className="flex items-center gap-4">
             <Link href="/" className="flex items-center gap-2 group">
-              <div className="w-5 h-5 bg-white group-hover:bg-zinc-300 transition-colors" />
+              <div className="w-5 h-5 bg-white group-hover:bg-zinc-300 transition-colors glow-white" />
               <span className="font-bold tracking-tight text-lg">XED SCREENER</span>
             </Link>
             <div className="hidden lg:block border-l border-white/10 pl-4">
@@ -59,105 +72,117 @@ function SuccessContent() {
         </div>
       </nav>
 
-      <div className="flex-1 flex items-center justify-center p-6">
+      <div className="flex-1 flex items-center justify-center p-6 relative z-10">
         <div className="max-w-lg w-full space-y-8">
-          <div className="text-center">
-            <div className="w-24 h-24 mx-auto bg-green-500/20 border-2 border-green-500 flex items-center justify-center mb-6 animate-pulse">
-              <svg className="w-12 h-12 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
-              </svg>
+          <ScrollReveal direction="down">
+            <div className="text-center">
+              <div className="w-24 h-24 mx-auto bg-green-500/20 border-2 border-green-500 flex items-center justify-center mb-6 glow-green success-bounce">
+                <svg className="w-12 h-12 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
+                </svg>
+              </div>
+              <h1 className="text-3xl font-bold tracking-tight mb-2">
+                <GradientText>SUBMISSION RECEIVED</GradientText>
+              </h1>
+              <p className="text-zinc-400">Your token metadata has been submitted for review</p>
             </div>
-            <h1 className="text-3xl font-bold tracking-tight mb-2">SUBMISSION RECEIVED</h1>
-            <p className="text-zinc-400">Your token metadata has been submitted for review</p>
-          </div>
+          </ScrollReveal>
 
           {(name || symbol) && (
-            <div className="border border-white/10 bg-zinc-950 p-6">
-              <div className="flex items-center gap-4">
-                <div className="w-16 h-16 bg-zinc-900 flex items-center justify-center">
-                  <span className="text-2xl font-bold text-zinc-500">{symbol.charAt(0) || "?"}</span>
-                </div>
-                <div>
-                  <h2 className="font-bold text-lg">{name}</h2>
-                  {symbol && <span className="text-sm font-mono text-zinc-500">${symbol}</span>}
-                </div>
-              </div>
-              {mint && (
-                <div className="mt-4 pt-4 border-t border-zinc-800">
-                  <p className="text-xs text-zinc-500 font-mono mb-1">MINT ADDRESS</p>
-                  <div className="flex items-center gap-2">
-                    <p className="text-sm font-mono truncate flex-1">{mint}</p>
-                    <button onClick={() => handleCopy(mint, "mint")} className="text-xs text-zinc-500 hover:text-white transition-colors">
-                      {copied === "mint" ? "Copied!" : "Copy"}
-                    </button>
+            <ScrollReveal direction="up" delay={200}>
+              <div className="border border-white/10 bg-zinc-950/80 backdrop-blur-sm p-6 card-glow">
+                <div className="flex items-center gap-4">
+                  <div className="w-16 h-16 bg-zinc-900 flex items-center justify-center glow-purple">
+                    <span className="text-2xl font-bold text-purple-400">{symbol.charAt(0) || "?"}</span>
+                  </div>
+                  <div>
+                    <h2 className="font-bold text-lg">{name}</h2>
+                    {symbol && <span className="text-sm font-mono text-purple-400">${symbol}</span>}
                   </div>
                 </div>
-              )}
-            </div>
+                {mint && (
+                  <div className="mt-4 pt-4 border-t border-zinc-800">
+                    <p className="text-xs text-zinc-500 font-mono mb-1">MINT ADDRESS</p>
+                    <div className="flex items-center gap-2">
+                      <p className="text-sm font-mono truncate flex-1">{mint}</p>
+                      <button onClick={() => handleCopy(mint, "mint")} className="text-xs text-zinc-500 hover:text-purple-400 transition-colors">
+                        {copied === "mint" ? "Copied!" : "Copy"}
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </ScrollReveal>
           )}
 
-          <div className="border border-white/10 p-6 space-y-4">
-            <h3 className="font-mono text-xs text-zinc-500">WHAT HAPPENS NEXT</h3>
-            <div className="space-y-4">
-              <div className="flex gap-4">
-                <div className="flex flex-col items-center">
-                  <div className="w-8 h-8 bg-green-500 flex items-center justify-center">
-                    <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" /></svg>
+          <ScrollReveal direction="up" delay={300}>
+            <div className="border border-white/10 bg-zinc-950/80 backdrop-blur-sm p-6 space-y-4">
+              <h3 className="font-mono text-xs text-zinc-500">WHAT HAPPENS NEXT</h3>
+              <div className="space-y-4">
+                <div className="flex gap-4">
+                  <div className="flex flex-col items-center">
+                    <div className="w-8 h-8 bg-green-500 flex items-center justify-center glow-green">
+                      <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" /></svg>
+                    </div>
+                    <div className="w-0.5 h-full bg-zinc-800 mt-2" />
                   </div>
-                  <div className="w-0.5 h-full bg-zinc-800 mt-2" />
-                </div>
-                <div className="pb-4">
-                  <p className="font-bold text-sm">Submission Received</p>
-                  <p className="text-xs text-zinc-500">Your request is in our queue</p>
-                </div>
-              </div>
-              <div className="flex gap-4">
-                <div className="flex flex-col items-center">
-                  <div className="w-8 h-8 bg-yellow-500 flex items-center justify-center animate-pulse">
-                    <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-                  </div>
-                  <div className="w-0.5 h-full bg-zinc-800 mt-2" />
-                </div>
-                <div className="pb-4">
-                  <p className="font-bold text-sm">Under Review</p>
-                  <p className="text-xs text-zinc-500">Typically takes 10-15 minutes</p>
-                </div>
-              </div>
-              <div className="flex gap-4">
-                <div className="flex flex-col items-center">
-                  <div className="w-8 h-8 bg-zinc-800 flex items-center justify-center">
-                    <svg className="w-4 h-4 text-zinc-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                  <div className="pb-4">
+                    <p className="font-bold text-sm">Submission Received</p>
+                    <p className="text-xs text-zinc-500">Your request is in our queue</p>
                   </div>
                 </div>
-                <div>
-                  <p className="font-bold text-sm text-zinc-500">Approved & Live</p>
-                  <p className="text-xs text-zinc-500">Token will appear in the registry</p>
+                <div className="flex gap-4">
+                  <div className="flex flex-col items-center">
+                    <div className="w-8 h-8 bg-yellow-500 flex items-center justify-center animate-pulse">
+                      <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                    </div>
+                    <div className="w-0.5 h-full bg-zinc-800 mt-2" />
+                  </div>
+                  <div className="pb-4">
+                    <p className="font-bold text-sm">Under Review</p>
+                    <p className="text-xs text-zinc-500">Typically takes 10-15 minutes</p>
+                  </div>
+                </div>
+                <div className="flex gap-4">
+                  <div className="flex flex-col items-center">
+                    <div className="w-8 h-8 bg-zinc-800 flex items-center justify-center">
+                      <svg className="w-4 h-4 text-zinc-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                    </div>
+                  </div>
+                  <div>
+                    <p className="font-bold text-sm text-zinc-500">Approved & Live</p>
+                    <p className="text-xs text-zinc-500">Token will appear in the registry</p>
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
+          </ScrollReveal>
 
-          <div className="space-y-3">
-            <Link href={mint ? `/status?mint=${encodeURIComponent(mint)}` : "/status"} className="block">
-              <Button className="w-full h-12 bg-white text-black hover:bg-zinc-200 rounded-none font-bold tracking-widest text-sm">CHECK STATUS</Button>
-            </Link>
-            <div className="grid grid-cols-2 gap-3">
-              <Button onClick={shareOnTwitter} variant="outline" className="h-12 rounded-none font-mono text-xs border-zinc-700">
-                <svg className="w-4 h-4 mr-2" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" /></svg>
-                SHARE
-              </Button>
-              <Link href="/start" className="block">
-                <Button variant="outline" className="w-full h-12 rounded-none font-mono text-xs border-zinc-700">+ SUBMIT ANOTHER</Button>
+          <ScrollReveal direction="up" delay={400}>
+            <div className="space-y-3">
+              <Link href={mint ? `/status?mint=${encodeURIComponent(mint)}` : "/status"} className="block">
+                <Button className="w-full h-12 bg-white text-black hover:bg-zinc-200 rounded-none font-bold tracking-widest text-sm btn-glow">CHECK STATUS</Button>
               </Link>
+              <div className="grid grid-cols-2 gap-3">
+                <Button onClick={shareOnTwitter} variant="outline" className="h-12 rounded-none font-mono text-xs border-zinc-700 hover:border-purple-500/50 hover:bg-purple-500/10 transition-all">
+                  <svg className="w-4 h-4 mr-2" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" /></svg>
+                  SHARE
+                </Button>
+                <Link href="/start" className="block">
+                  <Button variant="outline" className="w-full h-12 rounded-none font-mono text-xs border-zinc-700 hover:border-purple-500/50 hover:bg-purple-500/10 transition-all">+ SUBMIT ANOTHER</Button>
+                </Link>
+              </div>
             </div>
-          </div>
+          </ScrollReveal>
 
-          <div className="border-t border-white/10 pt-6">
-            <div className="grid grid-cols-2 gap-4 text-center">
-              <Link href="/explorer" className="text-sm text-zinc-400 hover:text-white transition-colors">View Explorer →</Link>
-              <Link href="/docs" className="text-sm text-zinc-400 hover:text-white transition-colors">Read Docs →</Link>
+          <ScrollReveal direction="fade" delay={500}>
+            <div className="border-t border-white/10 pt-6">
+              <div className="grid grid-cols-2 gap-4 text-center">
+                <Link href="/explorer" className="text-sm text-zinc-400 hover:text-purple-400 transition-colors">View Explorer →</Link>
+                <Link href="/docs" className="text-sm text-zinc-400 hover:text-purple-400 transition-colors">Read Docs →</Link>
+              </div>
             </div>
-          </div>
+          </ScrollReveal>
         </div>
       </div>
     </main>
@@ -171,4 +196,3 @@ export default function SuccessPage() {
     </Suspense>
   );
 }
-
