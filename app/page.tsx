@@ -14,6 +14,7 @@ import { Spotlight } from "@/components/spotlight";
 import { ScrollReveal } from "@/components/scroll-reveal";
 import { GradientText } from "@/components/gradient-text";
 import { TiltCard } from "@/components/tilt-card";
+import { AuthButton } from "@/components/auth-button";
 
 export default function LandingPage() {
   return (
@@ -57,6 +58,9 @@ export default function LandingPage() {
                 LAUNCH APP
               </Button>
             </Link>
+            <div className="border-l border-zinc-800 pl-4 ml-2">
+              <AuthButton />
+            </div>
           </div>
           {/* Mobile Navigation */}
           <MobileMenu />

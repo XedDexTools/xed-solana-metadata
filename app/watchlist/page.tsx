@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { PriceWidget } from "@/components/price-widget";
+import { Navbar } from "@/components/navbar";
 import { getWatchlist, removeFromWatchlist } from "@/components/watchlist-button";
 
 type WatchlistItem = {
@@ -41,26 +41,7 @@ export default function WatchlistPage() {
       <div className="scanline" />
 
       {/* Navbar */}
-      <nav className="relative z-10 border-b border-white/10 bg-black">
-        <div className="max-w-[1400px] mx-auto px-6 h-16 flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <Link href="/" className="flex items-center gap-2 group">
-              <div className="w-5 h-5 bg-white group-hover:bg-zinc-300 transition-colors" />
-              <span className="font-bold tracking-tight text-lg">XED SCREENER</span>
-            </Link>
-            <div className="hidden lg:block border-l border-white/10 pl-4">
-              <PriceWidget />
-            </div>
-          </div>
-          <div className="hidden md:flex items-center gap-6">
-            <Link href="/explorer" className="text-sm text-zinc-400 hover:text-white transition-colors">Explorer</Link>
-            <Link href="/start" className="text-sm text-zinc-400 hover:text-white transition-colors">Submit</Link>
-            <a href="https://x.com/XEDscreener" target="_blank" rel="noopener noreferrer" className="text-zinc-400 hover:text-white transition-colors">
-              <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" /></svg>
-            </a>
-          </div>
-        </div>
-      </nav>
+      <Navbar />
 
       {/* Content */}
       <div className="relative z-10 py-12">
@@ -176,7 +157,7 @@ export default function WatchlistPage() {
           {/* Info Box */}
           <div className="mt-8 border border-zinc-800 bg-zinc-950 p-4">
             <p className="text-xs text-zinc-500 font-mono">
-              💡 Your watchlist is stored locally in your browser. It will persist across sessions but won&apos;t sync across devices.
+              💡 Your watchlist is stored locally in your browser. Sign in to sync across devices in a future update.
             </p>
           </div>
         </div>
