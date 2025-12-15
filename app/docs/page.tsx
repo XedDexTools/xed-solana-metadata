@@ -31,7 +31,7 @@ export default function DocsPage() {
             </div>
           </div>
           <div className="hidden md:flex items-center gap-6">
-            <span className="font-mono text-xs text-zinc-500">SYSTEM_DOCS_V1.2.4</span>
+            <span className="font-mono text-xs text-zinc-500">SYSTEM_DOCS_V1.3.0</span>
             <a href="https://x.com/XEDscreener" target="_blank" rel="noopener noreferrer" className="text-zinc-400 hover:text-white transition-colors">
               <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" /></svg>
             </a>
@@ -86,7 +86,7 @@ export default function DocsPage() {
                 STATUS: ONLINE
               </div>
               <div className="inline-flex items-center gap-2 border border-white/10 bg-white/5 px-3 py-1 text-xs font-mono text-zinc-400">
-                LAST_UPDATED: 2025-12-11
+                LAST_UPDATED: 2025-12-14
               </div>
             </div>
             <h1 className="text-4xl md:text-6xl font-bold tracking-tighter">TECHNICAL SPECIFICATION</h1>
@@ -141,10 +141,11 @@ export default function DocsPage() {
               <div className="border border-white/10 bg-zinc-900/20 p-6 space-y-4">
                 <h3 className="font-mono text-sm text-zinc-400 border-b border-white/10 pb-2">DEPENDENCIES</h3>
                 <ul className="space-y-3 text-sm font-mono text-zinc-300">
-                  <li className="flex justify-between"><span>@supabase/js</span> <span className="text-zinc-500">v2.39.0</span></li>
+                  <li className="flex justify-between"><span>@supabase/js</span> <span className="text-zinc-500">v2.86.2</span></li>
                   <li className="flex justify-between"><span>next</span> <span className="text-zinc-500">v16.0.7</span></li>
-                  <li className="flex justify-between"><span>react</span> <span className="text-zinc-500">v19.0.0</span></li>
-                  <li className="flex justify-between"><span>tailwindcss</span> <span className="text-zinc-500">v4.0.0</span></li>
+                  <li className="flex justify-between"><span>react</span> <span className="text-zinc-500">v19.2.0</span></li>
+                  <li className="flex justify-between"><span>tailwindcss</span> <span className="text-zinc-500">v4.1.18</span></li>
+                  <li className="flex justify-between"><span>@vercel/analytics</span> <span className="text-zinc-500">v1.6.1</span></li>
                 </ul>
               </div>
             </div>
@@ -169,9 +170,13 @@ export default function DocsPage() {
                 <div className="w-8 h-8 bg-zinc-800 flex items-center justify-center mb-4 font-bold text-xs">02</div>
                 <h3 className="font-bold text-lg mb-2">Rate Limiting</h3>
                 <p className="text-sm text-zinc-400 leading-relaxed">
-                  Submissions are throttled via a sliding window algorithm keyed by `wallet` + `mint` pairs.
+                  All API endpoints are protected with sliding window rate limiting per IP address.
                   <br/><br/>
-                  <span className="font-mono text-xs bg-red-900/20 text-red-400 px-2 py-1">LIMIT: 1 REQ / 10800 SEC</span>
+                  <span className="font-mono text-xs bg-red-900/20 text-red-400 px-2 py-1">SUBMIT: 5 REQ / MIN</span>
+                  <br/>
+                  <span className="font-mono text-xs bg-yellow-900/20 text-yellow-400 px-2 py-1 mt-1 inline-block">GENERAL: 30-100 REQ / MIN</span>
+                  <br/><br/>
+                  Submissions also have cooldown: <span className="font-mono text-xs bg-zinc-900 text-zinc-400 px-2 py-1">1 REQ / 3 HRS per wallet+mint</span>
                 </p>
               </div>
               <div className="p-6 border border-white/10 bg-zinc-900/10 hover:bg-zinc-900/30 transition-colors">
@@ -179,6 +184,20 @@ export default function DocsPage() {
                 <h3 className="font-bold text-lg mb-2">Asset Verification</h3>
                 <p className="text-sm text-zinc-400 leading-relaxed">
                   Image assets are isolated in a public storage bucket with strict CORS policies. Max file size constraints (5MB) are enforced at the upload edge.
+                </p>
+              </div>
+              <div className="p-6 border border-white/10 bg-zinc-900/10 hover:bg-zinc-900/30 transition-colors">
+                <div className="w-8 h-8 bg-zinc-800 flex items-center justify-center mb-4 font-bold text-xs">04</div>
+                <h3 className="font-bold text-lg mb-2">Authentication</h3>
+                <p className="text-sm text-zinc-400 leading-relaxed">
+                  Optional Google OAuth via Supabase Auth. Sign-in enables future features like cross-device watchlist sync. All core features remain accessible without authentication.
+                </p>
+              </div>
+              <div className="p-6 border border-white/10 bg-zinc-900/10 hover:bg-zinc-900/30 transition-colors">
+                <div className="w-8 h-8 bg-zinc-800 flex items-center justify-center mb-4 font-bold text-xs">05</div>
+                <h3 className="font-bold text-lg mb-2">Error Boundaries</h3>
+                <p className="text-sm text-zinc-400 leading-relaxed">
+                  React error boundaries catch and gracefully handle component failures, preventing full page crashes and providing user-friendly error messages.
                 </p>
               </div>
             </div>
@@ -200,7 +219,7 @@ export default function DocsPage() {
                 </div>
                 <div className="border-l-2 border-zinc-800 pl-6 space-y-6">
                   <p className="text-zinc-400 max-w-2xl">
-                    Primary ingestion endpoint for metadata registration. Handles cooldown checks, validation, and database persistence.
+                    Primary ingestion endpoint for metadata registration. Handles cooldown checks, validation, and database persistence. Rate limited to 5 requests per minute per IP.
                   </p>
                   
                   <div className="grid md:grid-cols-2 gap-8">
@@ -211,13 +230,12 @@ export default function DocsPage() {
   "wallet": "So111...111",  // required, base58
   "mint": "EPjFW...e76",    // required, base58
   "name": "USD Coin",       // required, max 80
-  "symbol": "USDC",         // required, max 10
-  "description": "Stable...", // required
-  "image": "https://...",   // required, url
-  "socials": {              // optional
-    "twitter": "@circle",
-    "website": "circle.com"
-  }
+  "symbol": "USDC",         // required, max 16
+  "description": "Stable...", // required, max 1000
+  "image": "https://...",   // required, url, max 500
+  "twitter": "https://...", // optional, max 200
+  "telegram": "https://...", // optional, max 200
+  "website": "https://..."  // optional, max 500
 }`}
                       </pre>
                     </div>
@@ -262,6 +280,131 @@ export default function DocsPage() {
                       </div>
                     </div>
                   </div>
+                </div>
+              </div>
+
+              {/* GET /api/explorer */}
+              <div className="space-y-4">
+                <div className="flex items-center gap-4">
+                  <span className="bg-blue-500 text-black px-3 py-1 font-bold font-mono text-sm">GET</span>
+                  <span className="font-mono text-lg text-white">/api/explorer</span>
+                </div>
+                <div className="border-l-2 border-zinc-800 pl-6 space-y-6">
+                  <p className="text-zinc-400 max-w-2xl">
+                    Paginated listing of all approved tokens. Supports search and sorting.
+                  </p>
+                  <div className="space-y-2">
+                    <div className="text-xs font-mono text-zinc-500 uppercase">Query Parameters</div>
+                    <div className="border border-white/10 bg-zinc-950">
+                      <div className="grid grid-cols-3 border-b border-white/10 p-2 text-xs font-mono text-zinc-500">
+                        <div>PARAM</div>
+                        <div>TYPE</div>
+                        <div>DESCRIPTION</div>
+                      </div>
+                      <div className="grid grid-cols-3 p-2 text-xs font-mono text-zinc-300 border-b border-white/5">
+                        <div className="text-white">page</div>
+                        <div>number</div>
+                        <div>Page number (default: 1)</div>
+                      </div>
+                      <div className="grid grid-cols-3 p-2 text-xs font-mono text-zinc-300 border-b border-white/5">
+                        <div className="text-white">limit</div>
+                        <div>number</div>
+                        <div>Items per page (max: 50, default: 20)</div>
+                      </div>
+                      <div className="grid grid-cols-3 p-2 text-xs font-mono text-zinc-300 border-b border-white/5">
+                        <div className="text-white">search</div>
+                        <div>string</div>
+                        <div>Search by name, symbol, or mint</div>
+                      </div>
+                      <div className="grid grid-cols-3 p-2 text-xs font-mono text-zinc-300">
+                        <div className="text-white">sort</div>
+                        <div>string</div>
+                        <div>Sort by: newest, oldest, name</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* GET /api/dexscreener */}
+              <div className="space-y-4">
+                <div className="flex items-center gap-4">
+                  <span className="bg-blue-500 text-black px-3 py-1 font-bold font-mono text-sm">GET</span>
+                  <span className="font-mono text-lg text-white">/api/dexscreener</span>
+                </div>
+                <div className="border-l-2 border-zinc-800 pl-6 space-y-6">
+                  <p className="text-zinc-400 max-w-2xl">
+                    Fetches live market data from DexScreener API. Returns price, volume, liquidity, market cap, and trading data. Cached for 60 seconds.
+                  </p>
+                  <div className="space-y-2">
+                    <div className="text-xs font-mono text-zinc-500 uppercase">Query Parameters</div>
+                    <div className="border border-white/10 bg-zinc-950">
+                      <div className="grid grid-cols-3 border-b border-white/10 p-2 text-xs font-mono text-zinc-500">
+                        <div>PARAM</div>
+                        <div>TYPE</div>
+                        <div>DESCRIPTION</div>
+                      </div>
+                      <div className="grid grid-cols-3 p-2 text-xs font-mono text-zinc-300">
+                        <div className="text-white">mint</div>
+                        <div>string</div>
+                        <div>Token mint address</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* GET /api/search */}
+              <div className="space-y-4">
+                <div className="flex items-center gap-4">
+                  <span className="bg-blue-500 text-black px-3 py-1 font-bold font-mono text-sm">GET</span>
+                  <span className="font-mono text-lg text-white">/api/search</span>
+                </div>
+                <div className="border-l-2 border-zinc-800 pl-6 space-y-6">
+                  <p className="text-zinc-400 max-w-2xl">
+                    Autocomplete search endpoint. Returns up to 8 matching tokens by name, symbol, or mint address.
+                  </p>
+                  <div className="space-y-2">
+                    <div className="text-xs font-mono text-zinc-500 uppercase">Query Parameters</div>
+                    <div className="border border-white/10 bg-zinc-950">
+                      <div className="grid grid-cols-3 border-b border-white/10 p-2 text-xs font-mono text-zinc-500">
+                        <div>PARAM</div>
+                        <div>TYPE</div>
+                        <div>DESCRIPTION</div>
+                      </div>
+                      <div className="grid grid-cols-3 p-2 text-xs font-mono text-zinc-300">
+                        <div className="text-white">q</div>
+                        <div>string</div>
+                        <div>Search query (min 2 characters)</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* GET /api/stats */}
+              <div className="space-y-4">
+                <div className="flex items-center gap-4">
+                  <span className="bg-blue-500 text-black px-3 py-1 font-bold font-mono text-sm">GET</span>
+                  <span className="font-mono text-lg text-white">/api/stats</span>
+                </div>
+                <div className="border-l-2 border-zinc-800 pl-6 space-y-6">
+                  <p className="text-zinc-400 max-w-2xl">
+                    Returns aggregate statistics: total tokens, pending, approved, and rejected counts. Cached for 1 minute.
+                  </p>
+                </div>
+              </div>
+
+              {/* GET /api/activity */}
+              <div className="space-y-4">
+                <div className="flex items-center gap-4">
+                  <span className="bg-blue-500 text-black px-3 py-1 font-bold font-mono text-sm">GET</span>
+                  <span className="font-mono text-lg text-white">/api/activity</span>
+                </div>
+                <div className="border-l-2 border-zinc-800 pl-6 space-y-6">
+                  <p className="text-zinc-400 max-w-2xl">
+                    Returns the 10 most recently approved tokens for activity feed display.
+                  </p>
                 </div>
               </div>
             </div>
