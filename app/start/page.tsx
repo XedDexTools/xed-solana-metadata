@@ -150,6 +150,7 @@ function Tooltip({ text }: { text: string }) {
 export default function StartPage() {
   const router = useRouter();
   const [status, setStatus] = useState<string | null>(null);
+  const [snowballMode, setSnowballMode] = useState(false);
   const [loading, setLoading] = useState(false);
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imagePreviewUrl, setImagePreviewUrl] = useState<string | null>(null);
@@ -424,14 +425,74 @@ export default function StartPage() {
             <h2 className="font-mono text-xs text-zinc-500 mb-2">APPROVAL TIME</h2>
             <p className="text-sm font-mono text-green-400">~10-15 MIN</p>
           </div>
+          {snowballMode && (
+            <div className="border border-purple-500/30 bg-purple-900/10 p-4 rounded space-y-3">
+              <div className="flex items-center gap-2">
+                <span className="w-2 h-2 rounded-full bg-purple-400 pulse-glow" />
+                <h2 className="font-mono text-xs text-purple-400">SNOWBALL MODE</h2>
+              </div>
+              <div className="space-y-2">
+                <p className="text-xs text-purple-300/80">
+                  Dev fees redirect to chart liquidity
+                </p>
+                <div className="flex items-center gap-1.5 pt-2 border-t border-purple-500/20">
+                  <svg className="w-3 h-3 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                  </svg>
+                  <p className="text-[10px] font-mono text-red-400">IRREVERSIBLE</p>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Main Content */}
         <div className="flex-1 p-6 md:p-12 overflow-y-auto">
           <div className="max-w-2xl mx-auto space-y-8">
-            <div>
-              <h1 className="text-3xl font-bold tracking-tight mb-2">NEW ENTRY</h1>
-              <p className="text-zinc-400">Submit metadata for on-chain registration.</p>
+            <div className="flex items-start justify-between gap-4">
+              <div>
+                <h1 className="text-3xl font-bold tracking-tight mb-2">NEW ENTRY</h1>
+                <p className="text-zinc-400">Submit metadata for on-chain registration.</p>
+              </div>
+              
+              {/* SNOWBALL Mode Toggle */}
+              <div className="flex flex-col items-end gap-2">
+                <div className="flex items-center gap-3">
+                  <div className="flex flex-col items-end gap-1">
+                    <span className={`text-xs font-mono transition-colors ${snowballMode ? "text-purple-400" : "text-zinc-500"}`}>
+                      SNOWBALL MODE
+                    </span>
+                    <span className="text-[10px] font-mono text-zinc-500">Fee → Chart</span>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setSnowballMode(!snowballMode)}
+                    className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 focus:ring-offset-black ${
+                      snowballMode ? "bg-purple-600" : "bg-zinc-700"
+                    }`}
+                  >
+                    <span
+                      className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                        snowballMode ? "translate-x-6" : "translate-x-1"
+                      }`}
+                    />
+                  </button>
+                </div>
+                {snowballMode && (
+                  <div className="flex flex-col items-end gap-1">
+                    <div className="flex items-center gap-1.5 px-2 py-1 border border-purple-500/30 bg-purple-900/10">
+                      <span className="w-1.5 h-1.5 rounded-full bg-purple-400 pulse-glow" />
+                      <span className="text-[10px] font-mono text-purple-400">ACTIVE</span>
+                    </div>
+                    <div className="flex items-center gap-1.5 px-2 py-1 border border-red-500/30 bg-red-900/10">
+                      <svg className="w-3 h-3 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                      </svg>
+                      <span className="text-[10px] font-mono text-red-400">IRREVERSIBLE</span>
+                    </div>
+                  </div>
+                )}
+              </div>
             </div>
 
             <FormProgress currentSection={currentSection} />
@@ -642,6 +703,29 @@ export default function StartPage() {
                   </div>
                 </div>
               </div>
+
+              {/* SNOWBALL Mode Warning */}
+              {snowballMode && (
+                <div className="border-2 border-red-500/50 bg-red-900/10 p-6 space-y-3">
+                  <div className="flex items-center gap-3">
+                    <svg className="w-6 h-6 text-red-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                    </svg>
+                    <div className="flex-1">
+                      <h3 className="text-sm font-bold text-red-400 mb-1">SNOWBALL MODE ENABLED</h3>
+                      <p className="text-xs text-red-300/80 font-mono">
+                        Dev fees will be automatically redirected to chart liquidity. This action is <span className="font-bold text-red-400">IRREVERSIBLE</span> once confirmed.
+                      </p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2 pt-2 border-t border-red-500/20">
+                    <div className="w-2 h-2 rounded-full bg-red-400 pulse-glow" />
+                    <p className="text-[10px] font-mono text-red-400">
+                      All collected dev fees → Chart liquidity (permanent)
+                    </p>
+                  </div>
+                </div>
+              )}
 
               <div className="pt-8 space-y-4">
                 <Button 

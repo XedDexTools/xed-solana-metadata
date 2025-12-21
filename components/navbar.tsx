@@ -22,6 +22,16 @@ export function Navbar({ showStatus }: NavbarProps) {
           </div>
         </div>
         <div className="hidden md:flex items-center gap-6">
+          {/* SNOWBALL Badge */}
+          <a
+            href="https://x.com/i/communities/2001678386968564186"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-2 px-3 py-1.5 border border-purple-500/30 bg-purple-900/10 hover:bg-purple-900/20 text-xs font-mono text-purple-400 hover:text-purple-300 transition-all"
+          >
+            <span className="w-1.5 h-1.5 rounded-full bg-purple-400 pulse-glow" />
+            SNOWBALL
+          </a>
           <Link href="/explorer" className="text-sm text-zinc-400 hover:text-white transition-colors">Explorer</Link>
           <Link href="/start" className="text-sm text-zinc-400 hover:text-white transition-colors">Submit Token</Link>
           {showStatus && (

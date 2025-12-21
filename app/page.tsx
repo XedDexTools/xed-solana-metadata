@@ -29,6 +29,26 @@ export default function LandingPage() {
       <div className="fixed inset-0 arc-grid pointer-events-none z-0 opacity-30" />
       <div className="scanline" />
       
+      {/* SNOWBALL Integration Banner */}
+      <div className="relative z-10 border-b border-purple-500/30 bg-gradient-to-r from-purple-900/20 via-blue-900/20 to-teal-900/20 backdrop-blur-sm">
+        <div className="max-w-[1400px] mx-auto px-6 py-3 flex items-center justify-center gap-3">
+          <div className="flex items-center gap-2">
+            <div className="w-2 h-2 rounded-full bg-purple-400 pulse-glow" />
+            <span className="text-xs font-mono text-zinc-300">
+              POWERED BY <span className="text-purple-400 font-bold">SNOWBALL</span> TECHNOLOGY
+            </span>
+            <a 
+              href="https://x.com/i/communities/2001678386968564186" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="ml-2 text-purple-400 hover:text-purple-300 transition-colors"
+            >
+              →
+            </a>
+          </div>
+        </div>
+      </div>
+
       {/* Navbar */}
       <nav className="relative z-10 border-b border-white/10 bg-black/50 backdrop-blur-md">
         <div className="max-w-[1400px] mx-auto px-6 h-16 flex items-center justify-between">
@@ -44,6 +64,16 @@ export default function LandingPage() {
           </div>
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center gap-6">
+            {/* SNOWBALL Badge */}
+            <a
+              href="https://x.com/i/communities/2001678386968564186"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-2 px-3 py-1.5 border border-purple-500/30 bg-purple-900/10 hover:bg-purple-900/20 text-xs font-mono text-purple-400 hover:text-purple-300 transition-all"
+            >
+              <span className="w-1.5 h-1.5 rounded-full bg-purple-400 pulse-glow" />
+              SNOWBALL
+            </a>
             <Link href="/explorer" className="text-sm font-medium text-zinc-400 hover:text-white transition-colors">EXPLORER</Link>
             <Link href="/status" className="text-sm font-medium text-zinc-400 hover:text-white transition-colors">STATUS</Link>
             <Link href="/docs" className="text-sm font-medium text-zinc-400 hover:text-white transition-colors">DOCS</Link>
@@ -131,6 +161,86 @@ export default function LandingPage() {
         </div>
       </div>
 
+      {/* SNOWBALL Integration Section */}
+      <div className="relative z-10 border-t border-white/10 bg-black/80 backdrop-blur-sm py-16">
+        <div className="max-w-[1400px] mx-auto px-6">
+          <ScrollReveal direction="up" delay={0}>
+            <div className="text-center mb-12">
+              <div className="inline-flex items-center gap-2 border border-purple-500/30 bg-purple-900/10 px-4 py-2 text-xs font-mono text-purple-400 mb-4">
+                <span className="w-2 h-2 rounded-full bg-purple-400 pulse-glow" />
+                NEW INTEGRATION
+              </div>
+              <h2 className="text-4xl font-bold mb-4">
+                <GradientText colors={["#a855f7", "#3b82f6", "#14b8a6"]}>
+                  SNOWBALL TECHNOLOGY
+                </GradientText>
+              </h2>
+              <p className="text-zinc-400 max-w-2xl mx-auto">
+                Integrated with SNOWBALL's cutting-edge infrastructure for enhanced performance and reliability.
+              </p>
+            </div>
+          </ScrollReveal>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <ScrollReveal delay={100} direction="up">
+              <TiltCard>
+                <div className="border border-purple-500/20 bg-gradient-to-br from-purple-900/20 to-blue-900/20 p-8 feature-card">
+                  <div className="w-12 h-12 bg-purple-500/20 rounded-lg flex items-center justify-center mb-4 glow-purple">
+                    <svg className="w-6 h-6 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                    </svg>
+                  </div>
+                  <h3 className="text-lg font-bold mb-2 text-purple-300">Lightning Fast</h3>
+                  <p className="text-sm text-zinc-400">Powered by SNOWBALL's optimized infrastructure</p>
+                </div>
+              </TiltCard>
+            </ScrollReveal>
+            
+            <ScrollReveal delay={200} direction="up">
+              <TiltCard>
+                <div className="border border-blue-500/20 bg-gradient-to-br from-blue-900/20 to-teal-900/20 p-8 feature-card">
+                  <div className="w-12 h-12 bg-blue-500/20 rounded-lg flex items-center justify-center mb-4 glow-blue">
+                    <svg className="w-6 h-6 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                    </svg>
+                  </div>
+                  <h3 className="text-lg font-bold mb-2 text-blue-300">Secure & Reliable</h3>
+                  <p className="text-sm text-zinc-400">Built on SNOWBALL's trusted technology stack</p>
+                </div>
+              </TiltCard>
+            </ScrollReveal>
+            
+            <ScrollReveal delay={300} direction="up">
+              <TiltCard>
+                <div className="border border-teal-500/20 bg-gradient-to-br from-teal-900/20 to-purple-900/20 p-8 feature-card">
+                  <div className="w-12 h-12 bg-teal-500/20 rounded-lg flex items-center justify-center mb-4 glow-teal">
+                    <svg className="w-6 h-6 text-teal-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                    </svg>
+                  </div>
+                  <h3 className="text-lg font-bold mb-2 text-teal-300">Seamless Integration</h3>
+                  <p className="text-sm text-zinc-400">Fully integrated with SNOWBALL ecosystem</p>
+                </div>
+              </TiltCard>
+            </ScrollReveal>
+          </div>
+
+          <div className="text-center mt-8">
+            <a
+              href="https://x.com/i/communities/2001678386968564186"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 px-6 py-3 border border-purple-500/30 bg-purple-900/20 hover:bg-purple-900/30 text-purple-300 hover:text-purple-200 transition-all neon-border"
+            >
+              <span className="font-mono text-sm">LEARN MORE ABOUT SNOWBALL</span>
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+              </svg>
+            </a>
+          </div>
+        </div>
+      </div>
+
       {/* Search Bar */}
       <div className="relative z-10 border-t border-white/10 bg-black/80 backdrop-blur-sm py-8">
         <div className="max-w-2xl mx-auto px-6">
@@ -199,8 +309,22 @@ export default function LandingPage() {
 
       {/* Footer */}
       <footer className="relative z-10 border-t border-white/10 bg-black/90 backdrop-blur-sm py-8">
-        <div className="max-w-[1400px] mx-auto px-6 flex justify-between items-center text-xs font-mono text-zinc-600">
+        <div className="max-w-[1400px] mx-auto px-6 flex flex-col md:flex-row justify-between items-center gap-4 text-xs font-mono text-zinc-600">
           <div>XED.SCREENER_V1.0</div>
+          
+          {/* SNOWBALL Badge */}
+          <div className="flex items-center gap-2 border border-purple-500/30 bg-purple-900/10 px-4 py-2 rounded">
+            <span className="text-purple-400">POWERED BY</span>
+            <a 
+              href="https://x.com/i/communities/2001678386968564186"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="font-bold text-purple-300 hover:text-purple-200 transition-colors"
+            >
+              SNOWBALL
+            </a>
+          </div>
+          
           <div className="flex gap-6">
             <a href="https://x.com/XEDscreener" target="_blank" rel="noopener noreferrer" className="hover:text-purple-400 cursor-pointer transition-colors">TWITTER</a>
             <a href="https://github.com/XedDexTools/xed-solana-metadata" target="_blank" rel="noopener noreferrer" className="hover:text-purple-400 cursor-pointer transition-colors">GITHUB</a>
